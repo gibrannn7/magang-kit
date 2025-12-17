@@ -32,9 +32,9 @@ $logoBase64 = base64_encode(file_get_contents($logoPath));
                 <span class="kop-title">BADAN PUSAT STATISTIK</span><br>
                 <span class="kop-sub">PROVINSI BANTEN</span><br>
                 <span class="kop-address">
-                    Jl. Syeh Nawawi Al Bantani, Kawasan Pusat Pemerintahan Provinsi Banten (KP3B), Kav. H1-2 Serang Banten.<br>
-                    Telp: (0254) 267027. Email: bps3600@bps.go.id, Website: http://banten.bps.go.id
-                </span>
+					Jl. Syeh Nawawi Al Bantani, Kawasan Pusat Pemerintahan Provinsi Banten (KP3B), Kav. H1-2 Serang Banten.<br>
+					Telp: (0254) 267027. Email: <span style="color: blue; text-decoration: underline;">bps3600@bps.go.id</span>, Website: http://banten.bps.go.id
+				</span>
             </td>
         </tr>
     </table>

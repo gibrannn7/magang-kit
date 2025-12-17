@@ -460,8 +460,8 @@
                     <div class="flex items-center gap-3 mb-4">
                         <img src="<?= base_url('assets/img/logo.png') ?>" class="h-12 w-auto bg-white rounded p-1 shadow">
                         <div>
-                            <h3 class="font-bold text-xl leading-none">BPS PROVINSI</h3>
-                            <span class="text-bps-accent text-2xl font-black tracking-widest">BANTEN</span>
+                            <h3 class="font-bold text-xl leading-none">Badan Pusat Statistik</h3>
+                            <span class="text-bps-accent text-2xl font-black tracking-widest">Provinsi BANTEN</span>
                         </div>
                     </div>
                     <p class="text-gray-300 text-sm leading-relaxed max-w-sm">

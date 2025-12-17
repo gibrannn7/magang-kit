@@ -295,4 +295,19 @@ class Admin extends CI_Controller {
         $this->session->set_flashdata('success', 'Fakultas berhasil dihapus');
         redirect('admin/master_fakultas');
     }
+
+	public function reset_password($user_id)
+    {
+        if (empty($user_id)) show_404();
+
+        // Default password: 123456
+        $new_password = password_hash('123456', PASSWORD_DEFAULT);
+
+        $this->db->update('users', ['password' => $new_password], ['id' => $user_id]);
+
+        $this->session->set_flashdata('success', 'Password berhasil direset menjadi: 123456');
+        
+        // Redirect kembali ke halaman asal (misal data peserta)
+        redirect($_SERVER['HTTP_REFERER']);
+    }
 }

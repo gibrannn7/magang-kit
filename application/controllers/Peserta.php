@@ -213,10 +213,14 @@ class Peserta extends CI_Controller {
 
     public function download_sertifikat()
     {
-        // (Biarkan kode ini seperti sebelumnya)
         require_once FCPATH . 'vendor/autoload.php';
         $user_id = $this->session->userdata('user_id');
-        $pendaftar = $this->db->get_where('pendaftar', ['user_id' => $user_id])->row();
+        
+        // Ambil data pendaftar & detail user
+        $pendaftar = $this->db->select('pendaftar.*, users.nama_lengkap')
+                              ->join('users', 'users.id = pendaftar.user_id')
+                              ->get_where('pendaftar', ['pendaftar.user_id' => $user_id])
+                              ->row();
 
         if (!$pendaftar || $pendaftar->status !== 'selesai') {
             $this->session->set_flashdata('error', 'Program magang belum selesai!');
@@ -226,25 +230,105 @@ class Peserta extends CI_Controller {
         $bulan = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
         $tm = strtotime($pendaftar->tgl_mulai);
         $ts = strtotime($pendaftar->tgl_selesai);
-        $tgl_mulai = date('j', $tm) . ' ' . $bulan[(int)date('n', $tm)] . ' ' . date('Y', $tm);
-        $tgl_selesai = date('j', $ts) . ' ' . $bulan[(int)date('n', $ts)] . ' ' . date('Y', $ts);
         
+        $tgl_mulai_indo = date('j', $tm) . ' ' . $bulan[(int)date('n', $tm)] . ' ' . date('Y', $tm);
+        $tgl_selesai_indo = date('j', $ts) . ' ' . $bulan[(int)date('n', $ts)] . ' ' . date('Y', $ts);
+        $tgl_sertif_indo = 'Serang, ' . date('j') . ' ' . $bulan[(int)date('n')] . ' ' . date('Y');
+
+        // --- PERBAIKAN HANDLING GAMBAR DISINI ---
+        $path_img = FCPATH . 'assets/templates/sertifikat_clean.jpg';
+        
+        // Cek apakah file ada?
+        if (file_exists($path_img)) {
+            $type = pathinfo($path_img, PATHINFO_EXTENSION);
+            $data_img = file_get_contents($path_img);
+            $base64_bg = 'data:image/' . $type . ';base64,' . base64_encode($data_img);
+        } else {
+            // Fallback jika gambar tidak ditemukan (agar tidak error blank page)
+            $base64_bg = ''; 
+            log_message('error', 'Sertifikat BG tidak ditemukan di: ' . $path_img);
+        }
+
         $data = [
             'nama' => strtoupper($pendaftar->nama),
-            'periode' => $tgl_mulai . ' - ' . $tgl_selesai,
-            'tanggal_sertifikat' => 'Serang, ' . date('j') . ' ' . $bulan[(int)date('n')] . ' ' . date('Y'),
-            'background_path' => base_url('assets/templates/sertifikat.jpg') 
+            'periode_text' => "Sebagai peserta Praktikum Profesi Lapangan (PPL) di kantor Badan Pusat Statistik Provinsi Banten mulai tanggal $tgl_mulai_indo s.d $tgl_selesai_indo.",
+            'tanggal_sertifikat' => $tgl_sertif_indo,
+            'background_base64' => $base64_bg // Kirim variable ini
         ];
 
         $html = $this->load->view('laporan/pdf_sertifikat', $data, TRUE);
+        
         $options = new \Dompdf\Options();
-        $options->set('isRemoteEnabled', true); 
-        $options->set('defaultFont', 'Times-Roman');
+        $options->set('isRemoteEnabled', true);
+        $options->set('defaultFont', 'Helvetica');
 
         $dompdf = new \Dompdf\Dompdf($options);
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', 'landscape');
         $dompdf->render();
-        $dompdf->stream("Sertifikat_Magang_" . str_replace(' ', '_', $pendaftar->nama) . ".pdf", ["Attachment" => 1]);
+        $dompdf->stream("Sertifikat_Magang_" . str_replace(' ', '_', $pendaftar->nama) . ".pdf", ["Attachment" => 0]); 
+    }
+	public function ganti_password()
+    {
+        $data['title'] = 'Ganti Password';
+        $this->render_view('peserta/ganti_password', $data);
+    }
+
+    public function process_ganti_password()
+    {
+        // FIX: Gunakan trim() untuk hapus spasi & FALSE untuk disable XSS filtering pada password
+        $old_pass = trim($this->input->post('old_password', FALSE));
+        $new_pass = trim($this->input->post('new_password', FALSE));
+        $conf_pass = trim($this->input->post('conf_password', FALSE));
+        
+        $user_id = $this->session->userdata('user_id');
+
+        // Pastikan user ditemukan
+        $user = $this->db->get_where('users', ['id' => $user_id])->row();
+        if (!$user) {
+            $this->session->set_flashdata('error', 'Sesi anda berakhir, silakan login ulang.');
+            redirect('auth/login');
+        }
+
+        // 1. Cek Password Lama
+        if (!password_verify($old_pass, $user->password)) {
+            $this->session->set_flashdata('error', 'Password lama salah! Pastikan tidak ada spasi.');
+            redirect('peserta/ganti_password');
+            return;
+        }
+
+        // 2. Cek Password Baru Match
+        if ($new_pass !== $conf_pass) {
+            $this->session->set_flashdata('error', 'Konfirmasi password baru tidak cocok!');
+            redirect('peserta/ganti_password');
+            return;
+        }
+        
+        // 2.1 Validasi panjang minimal (Opsional, good practice)
+        if (strlen($new_pass) < 6) {
+            $this->session->set_flashdata('error', 'Password baru minimal 6 karakter!');
+            redirect('peserta/ganti_password');
+            return;
+        }
+
+        // 3. Update Password
+        $hash_new = password_hash($new_pass, PASSWORD_DEFAULT);
+        $this->db->update('users', ['password' => $hash_new], ['id' => $user_id]);
+
+        $this->session->set_flashdata('success', 'Password berhasil diperbarui! Silakan login ulang dengan password baru.');
+        redirect('peserta/ganti_password');
+    }
+
+    // --- TASK 5: RIWAYAT LENGKAP ABSENSI ---
+    public function riwayat_absensi()
+    {
+        $user_id = $this->session->userdata('user_id');
+        
+        $data['absensi'] = $this->db->order_by('tanggal', 'DESC')
+                                    ->get_where('absensi', ['user_id' => $user_id])
+                                    ->result();
+                                    
+        $data['title'] = 'Riwayat Absensi Lengkap';
+        $this->render_view('peserta/riwayat_absensi', $data);
     }
 }
