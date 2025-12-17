@@ -608,7 +608,7 @@
             Swal.fire({
                 icon: 'success',
                 title: 'Pendaftaran Berhasil!',
-                text: 'Silahkan cek whatsapp berkala untuk informasi penerimaan',
+                text: <?= json_encode($this->session->flashdata('success')) ?>, // Gunakan json_encode
                 confirmButtonColor: '#003366'
             });
         <?php endif; ?>
@@ -618,7 +618,8 @@
             Swal.fire({
                 icon: 'error',
                 title: 'Gagal!',
-                text: '<?= strip_tags($this->session->flashdata('error')) ?>',
+                // PERBAIKAN DISINI: Gunakan json_encode agar enter/kutip aman
+                text: <?= json_encode(strip_tags($this->session->flashdata('error'))) ?>, 
                 confirmButtonColor: '#EF4444'
             });
         <?php endif; ?>

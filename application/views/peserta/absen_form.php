@@ -1,6 +1,10 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js"></script>
 
+<style>
+    #my_camera video { max-width: 100%; height: auto; }
+</style>
+
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card card-primary card-outline card-outline-tabs">
@@ -79,6 +83,10 @@
 </div>
 
 <script>
+    // Variable global untuk CSRF (akan diupdate setiap request)
+    let csrfName = '<?= $this->security->get_csrf_token_name() ?>';
+    let csrfHash = '<?= $this->security->get_csrf_hash() ?>';
+
     // 1. Setup Webcam
     Webcam.set({ width: 320, height: 240, image_format: 'jpeg', jpeg_quality: 90 });
     Webcam.attach('#my_camera');
@@ -88,10 +96,9 @@
 
     // 2. Geolocation
     if (navigator.geolocation) {
-        // Tambahkan options timeout (5 detik)
         const options = {
             enableHighAccuracy: true,
-            timeout: 5000, 
+            timeout: 10000, 
             maximumAge: 0
         };
         navigator.geolocation.getCurrentPosition(showPosition, showError, options);
@@ -104,23 +111,19 @@
         userLong = position.coords.longitude;
         document.getElementById("geo_info").innerHTML = `Lokasi Terkunci: ${userLat.toFixed(5)}, ${userLong.toFixed(5)}`;
         
-        // Enable tombol
         document.getElementById('btn-datang').disabled = false;
         document.getElementById('btn-pulang').disabled = false;
     }
 
-    // UPDATE FUNGSI SHOW ERROR
     function showError(error) {
         let msg = "";
         switch(error.code) {
             case error.PERMISSION_DENIED: msg = "Izin lokasi ditolak. Aktifkan GPS!"; break;
             case error.POSITION_UNAVAILABLE: msg = "Lokasi tidak ditemukan (Sinyal lemah)."; break;
-            case error.TIMEOUT: msg = "Gagal mendeteksi lokasi (Timeout). Coba lagi."; break;
+            case error.TIMEOUT: msg = "Gagal mendeteksi lokasi (Timeout). Refresh halaman."; break;
             default: msg = "Terjadi kesalahan sistem GPS."; break;
         }
         document.getElementById("geo_info").innerHTML = `<span class="text-danger font-weight-bold">${msg}</span>`;
-        
-        // Matikan loading jika ada
         Swal.fire({ icon: 'error', title: 'GPS Error', text: msg });
     }
 
@@ -130,6 +133,40 @@
             document.getElementById('prev_img').src = data_uri;
             document.getElementById('foto_data').value = data_uri;
         });
+    }
+
+    // --- FUNGSI KIRIM UMUM (Handling JSON & Error) ---
+    async function sendData(url, formData) {
+        // Append Token CSRF Terbaru
+        formData.append(csrfName, csrfHash);
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                body: formData
+            });
+
+            // Baca sebagai text dulu untuk debugging jika server error HTML
+            const textResponse = await response.text();
+            
+            let data;
+            try {
+                data = JSON.parse(textResponse);
+            } catch (err) {
+                // Jika gagal parse JSON, berarti Server Error (HTML)
+                throw new Error("Server Error: " + textResponse);
+            }
+
+            // Update CSRF Token untuk request berikutnya
+            if(data.csrf_token) {
+                csrfHash = data.csrf_token;
+            }
+
+            return data;
+
+        } catch (error) {
+            throw error;
+        }
     }
 
     // KIRIM ABSEN HADIR
@@ -143,11 +180,10 @@
             text: `Anda akan melakukan absen ${tipe}`,
             icon: 'question',
             showCancelButton: true,
-            confirmButtonColor: '#3085d6',
             confirmButtonText: 'Ya, Kirim!'
         }).then((result) => {
             if (result.isConfirmed) {
-                showLoading(); // Function global loading (jika ada) or manual Swal loading
+                Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
 
                 const formData = new FormData();
                 formData.append('latitude', userLat);
@@ -155,16 +191,20 @@
                 formData.append('tipe', tipe);
                 formData.append('foto', foto);
                 formData.append('is_izin', 'false');
-                formData.append(CSRF_NAME, CSRF_HASH);
 
-                fetch('<?= base_url('peserta/submit_absen') ?>', { method: 'POST', body: formData })
-                .then(res => res.json())
+                sendData('<?= base_url('peserta/submit_absen') ?>', formData)
                 .then(data => {
+                    Swal.close(); // Tutup loading
                     if(data.status) {
                         Swal.fire('Berhasil', data.message, 'success').then(() => window.location.href='<?= base_url('peserta') ?>');
                     } else {
                         Swal.fire('Gagal', data.message, 'error');
                     }
+                })
+                .catch(err => {
+                    Swal.close();
+                    console.error(err);
+                    Swal.fire('System Error', err.message, 'error');
                 });
             }
         });
@@ -175,81 +215,42 @@
 		const jenis = document.getElementById('jenis_izin').value;
 		const ket   = document.getElementById('keterangan_izin').value;
 
-		// Validasi keterangan
 		if (!ket) {
-			Swal.fire(
-				'Isi Keterangan',
-				'Keterangan izin wajib diisi secara detail.',
-				'warning'
-			);
+			Swal.fire('Isi Keterangan', 'Keterangan izin wajib diisi secara detail.', 'warning');
 			return;
 		}
 
-		// Konfirmasi pengajuan izin
 		Swal.fire({
 			title: 'Ajukan Izin?',
-			text: 'Anda menyatakan tidak dapat hadir hari ini.',
 			icon: 'warning',
 			showCancelButton: true,
-			confirmButtonText: 'Ya, Ajukan',
-			cancelButtonText: 'Batal'
+			confirmButtonText: 'Ya, Ajukan'
 		}).then((result) => {
 			if (result.isConfirmed) {
-
-				// Loading
-				Swal.fire({
-					title: 'Mengirim Izin...',
-					text: 'Mohon tunggu sebentar',
-					allowOutsideClick: false,
-					didOpen: () => {
-						Swal.showLoading();
-					}
-				});
+				Swal.fire({ title: 'Mengirim Izin...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
 
 				const formData = new FormData();
 				formData.append('is_izin', 'true');
 				formData.append('jenis_izin', jenis);
 				formData.append('keterangan', ket);
-				formData.append(CSRF_NAME, CSRF_HASH);
 
-				fetch('<?= base_url('peserta/submit_absen') ?>', {
-					method: 'POST',
-					body: formData
-				})
-				.then(response => response.json())
+				sendData('<?= base_url('peserta/submit_absen') ?>', formData)
 				.then(data => {
 					Swal.close();
-
 					if (data.status) {
-						Swal.fire(
-							'Izin Terkirim',
-							data.message,
-							'success'
-						).then(() => {
+						Swal.fire('Izin Terkirim', data.message, 'success').then(() => {
 							window.location.href = '<?= base_url('peserta') ?>';
 						});
 					} else {
-						Swal.fire(
-							'Gagal',
-							data.message,
-							'error'
-						);
+						Swal.fire('Gagal', data.message, 'error');
 					}
 				})
-				.catch(() => {
+				.catch(err => {
 					Swal.close();
-					Swal.fire(
-						'Error',
-						'Terjadi kesalahan saat mengirim data.',
-						'error'
-					);
+                    console.error(err);
+					Swal.fire('System Error', err.message, 'error');
 				});
 			}
 		});
 	}
-
-
-    function showLoading() {
-        Swal.fire({ title: 'Memproses...', didOpen: () => { Swal.showLoading() } });
-    }
 </script>

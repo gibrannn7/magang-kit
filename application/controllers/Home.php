@@ -24,29 +24,38 @@ class Home extends CI_Controller {
         $this->form_validation->set_rules('tgl_selesai', 'Tanggal Selesai', 'required');
 
         if ($this->form_validation->run() == FALSE) {
+            // Tampilkan error validasi
             $this->session->set_flashdata('error', validation_errors());
-            redirect('daftar');
+            // PERBAIKAN: Redirect kembali ke 'home' bukan 'daftar'
+            redirect('home#daftar'); 
+            return;
         }
 
         // 2. Hitung Durasi (Bulan)
         $d1 = new DateTime($this->input->post('tgl_mulai'));
         $d2 = new DateTime($this->input->post('tgl_selesai'));
         $interval = $d1->diff($d2);
-        $durasi_bulan = $interval->m + ($interval->y * 12) + ($interval->d > 15 ? 1 : 0); // Pembulatan sederhana
+        $durasi_bulan = $interval->m + ($interval->y * 12) + ($interval->d > 15 ? 1 : 0); 
 
-        // 3. Konfigurasi Upload (SECURE)
-        // Helper function private untuk upload
+        // 3. Konfigurasi Upload
         $upload_cv = $this->_upload_file('file_cv', 'cv', 'pdf|doc|docx');
         $upload_foto = $this->_upload_file('file_foto', 'foto', 'jpg|jpeg|png');
         $upload_surat = $this->_upload_file('file_surat', 'surat', 'pdf|jpg|jpeg|png');
 
+        // Cek Error Upload
         if(isset($upload_cv['error']) || isset($upload_foto['error']) || isset($upload_surat['error'])) {
-            $this->session->set_flashdata('error', 'Gagal Upload File. Pastikan format & ukuran sesuai.');
-            redirect('daftar');
+            $error_msg = '';
+            $error_msg .= isset($upload_cv['error']) ? 'CV: '.$upload_cv['error'].' ' : '';
+            $error_msg .= isset($upload_foto['error']) ? 'Foto: '.$upload_foto['error'].' ' : '';
+            $error_msg .= isset($upload_surat['error']) ? 'Surat: '.$upload_surat['error'] : '';
+            
+            $this->session->set_flashdata('error', $error_msg);
+            // PERBAIKAN: Redirect ke 'home'
+            redirect('home');
             return;
         }
 
-        // 4. Database Transaction (Atomicity)
+        // 4. Database Transaction
         $this->db->trans_start();
 
         $data_pendaftar = [
@@ -92,9 +101,13 @@ class Home extends CI_Controller {
         $this->db->trans_complete();
 
         if ($this->db->trans_status() === FALSE) {
-            $this->session->set_flashdata('error', 'Terjadi kesalahan sistem. Silakan coba lagi.');
-            redirect('home');
+            $this->session->set_flashdata('error', 'Terjadi kesalahan sistem database.');
+            redirect('home#daftar');
         } else {
+            // KIRIM NOTIFIKASI WA (Opsional, jika WA Client aktif)
+            $pesan_wa = "Halo *{$data_pendaftar['nama']}*,\n\nPendaftaran magang Anda telah kami terima. Mohon tunggu proses verifikasi admin.\n\nTerima Kasih,\nBPS Provinsi Banten.";
+            $this->wa_client->send_message($data_pendaftar['no_hp'], $pesan_wa);
+
             $this->session->set_flashdata('success', 'Pendaftaran Berhasil! Silakan tunggu konfirmasi via WhatsApp.');
             redirect('home');
         }

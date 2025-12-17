@@ -42,27 +42,30 @@
                     <tbody>
                         <?php foreach($pendaftar as $p): if($p->status != 'pending') continue; ?>
                         <tr>
-    <td>
-        <?= $p->nama ?><br>
-        <small class="text-muted"><?= $p->jurusan ?></small>
-    </td>
-    <td><?= $p->institusi ?></td>
-    <td>
-        <button type="button"
-                onclick="confirmAction('<?= base_url('admin/verifikasi/'.$p->id.'/diterima') ?>', 'terima')"
-                class="btn btn-xs btn-success"
-                title="Terima">
-            <i class="fas fa-check"></i> Terima
-        </button>
+							<td>
+								<?= $p->nama ?><br>
+								<small class="text-muted"><?= $p->jurusan ?></small>
+							</td>
+							<td><?= $p->institusi ?></td>
+							<td>
+								<a href="<?= base_url('admin/berkas/'.$p->id) ?>" class="btn btn-xs btn-info" title="Lihat Detail">
+									<i class="fas fa-eye"></i> Detail
+								</a>
+								<button type="button"
+										onclick="confirmAction('<?= base_url('admin/verifikasi/'.$p->id.'/diterima') ?>', 'terima')"
+										class="btn btn-xs btn-success"
+										title="Terima">
+									<i class="fas fa-check"></i> Terima
+								</button>
 
-        <button type="button"
-                onclick="confirmAction('<?= base_url('admin/verifikasi/'.$p->id.'/ditolak') ?>', 'tolak')"
-                class="btn btn-xs btn-danger"
-                title="Tolak">
-            <i class="fas fa-times"></i> Tolak
-        </button>
-    </td>
-</tr>
+								<button type="button"
+										onclick="confirmAction('<?= base_url('admin/verifikasi/'.$p->id.'/ditolak') ?>', 'tolak')"
+										class="btn btn-xs btn-danger"
+										title="Tolak">
+									<i class="fas fa-times"></i> Tolak
+								</button>
+							</td>
+						</tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
@@ -88,7 +91,7 @@
                                     <br><small class="text-danger"><i class="fas fa-exclamation-circle"></i> Error Akun</small>
                                 <?php endif; ?>
                             </td>
-                            <td><?= date('d/m', strtotime($p->tgl_mulai)) ?> - <?= date('d/m', strtotime($p->tgl_selesai)) ?></td>
+                            <td><?= date('d/m/y', strtotime($p->tgl_mulai)) ?> - <?= date('d/m/y', strtotime($p->tgl_selesai)) ?></td>
                             <td>
                                 <a href="<?= base_url('admin/berkas/'.$p->id) ?>" class="btn btn-xs btn-info" title="Lihat Detail & Akun"><i class="fas fa-eye"></i> Detail</a>
 
@@ -96,11 +99,11 @@
                                     <i class="fas fa-file-pdf text-danger"></i> Rekap
                                 </a>
                                 <button type="button"
-        onclick="confirmTamatkan('<?= base_url('admin/set_selesai/'.$p->id) ?>')"
-        class="btn btn-xs btn-warning font-weight-bold"
-        title="Tamatkan">
-    <i class="fas fa-flag-checkered"></i> Tamatkan
-</button>
+									onclick="confirmTamatkan('<?= base_url('admin/set_selesai/'.$p->id) ?>')"
+									class="btn btn-xs btn-warning font-weight-bold"
+									title="Tamatkan">
+								<i class="fas fa-flag-checkered"></i> Tamatkan
+							</button>
 
                             </td>
                         </tr>
