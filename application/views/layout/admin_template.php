@@ -56,32 +56,47 @@
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
           
           <?php if($this->session->userdata('role') == 'admin'): ?>
-            <li class="nav-item">
-              <a href="<?= base_url('admin') ?>" class="nav-link <?= ($this->uri->segment(1)=='admin' && $this->uri->segment(2)=='')?'active':'' ?>">
-                <i class="nav-icon fas fa-tachometer-alt"></i>
-                <p>Dashboard</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="<?= base_url('admin/broadcast') ?>" class="nav-link <?= ($this->uri->segment(2)=='broadcast')?'active':'' ?>">
-                <i class="nav-icon fab fa-whatsapp"></i>
-                <p>Broadcast WA</p>
-              </a>
-            </li>
-            <li class="nav-header">MASTER DATA</li>
-            <li class="nav-item">
-                <a href="<?= base_url('admin/master_kampus') ?>" class="nav-link <?= ($this->uri->segment(2)=='master_kampus')?'active':'' ?>">
-                    <i class="nav-icon fas fa-university"></i>
-                    <p>Data Kampus</p>
-                </a>
-            </li>
-             <li class="nav-item">
-                <a href="<?= base_url('admin/master_jurusan') ?>" class="nav-link <?= ($this->uri->segment(2)=='master_jurusan')?'active':'' ?>">
-                    <i class="nav-icon fas fa-book"></i>
-                    <p>Data Jurusan</p>
-                </a>
-            </li>
-          <?php endif; ?>
+						<li class="nav-item">
+							<a href="<?= base_url('admin') ?>" class="nav-link <?= ($this->uri->segment(1)=='admin' && $this->uri->segment(2)=='')?'active':'' ?>">
+								<i class="nav-icon fas fa-tachometer-alt"></i>
+								<p>Dashboard (Ops)</p>
+							</a>
+						</li>
+						
+						<li class="nav-item">
+							<a href="<?= base_url('admin/data_peserta') ?>" class="nav-link <?= ($this->uri->segment(2)=='data_peserta')?'active':'' ?>">
+								<i class="nav-icon fas fa-users"></i>
+								<p>Data Semua Peserta</p>
+							</a>
+						</li>
+
+						<li class="nav-item">
+							<a href="<?= base_url('admin/broadcast') ?>" class="nav-link <?= ($this->uri->segment(2)=='broadcast')?'active':'' ?>">
+								<i class="nav-icon fab fa-whatsapp"></i>
+								<p>Broadcast WA</p>
+							</a>
+						</li>
+
+						<li class="nav-header">MASTER DATA</li>
+						<li class="nav-item">
+								<a href="<?= base_url('admin/master_kampus') ?>" class="nav-link <?= ($this->uri->segment(2)=='master_kampus')?'active':'' ?>">
+										<i class="nav-icon fas fa-university"></i>
+										<p>Data Kampus</p>
+								</a>
+						</li>
+						<li class="nav-item">
+								<a href="<?= base_url('admin/master_fakultas') ?>" class="nav-link <?= ($this->uri->segment(2)=='master_fakultas')?'active':'' ?>">
+										<i class="nav-icon fas fa-building"></i>
+										<p>Data Fakultas</p>
+								</a>
+						</li>
+						<li class="nav-item">
+								<a href="<?= base_url('admin/master_jurusan') ?>" class="nav-link <?= ($this->uri->segment(2)=='master_jurusan')?'active':'' ?>">
+										<i class="nav-icon fas fa-book"></i>
+										<p>Data Jurusan</p>
+								</a>
+						</li>
+				<?php endif; ?>
 
           <?php if($this->session->userdata('role') == 'peserta'): ?>
              <li class="nav-item">

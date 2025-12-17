@@ -1,94 +1,166 @@
 <div class="row">
+    <div class="col-md-12">
+        <table class="table table-bordered table-striped">
+            <tbody>
+				<tr class="bg-white">
+                    <th colspan="2" class="text-center text-bold text-dark">
+                        <i></i> BIODATA PESERTA
+                    </th>
+                </tr>
+                <tr>
+                    <th style="width: 30%;">Nama Lengkap</th>
+                    <td><?= $pendaftar->nama ?></td>
+                </tr>
+                <tr>
+                    <th>NIM / NIS</th>
+                    <td><?= $pendaftar->nim_nis ?></td>
+                </tr>
+                <tr>
+                    <th>Jenis Peserta</th>
+                    <td><?= ucfirst($pendaftar->jenis_peserta) ?></td>
+                </tr>
+                <tr>
+                    <th>Institusi / Sekolah</th>
+                    <td><?= $pendaftar->institusi ?></td>
+                </tr>
+                <tr>
+                    <th>Jurusan</th>
+                    <td><?= $pendaftar->jurusan ?></td>
+                </tr>
+                <tr>
+                    <th>Nomor WhatsApp</th>
+                    <td>
+                        <a href="https://wa.me/<?= $pendaftar->no_hp ?>" target="_blank" class="btn btn-success btn-xs">
+                            <i class="fab fa-whatsapp"></i> <?= $pendaftar->no_hp ?>
+                        </a>
+                    </td>
+                </tr>
 
-    <div class="col-md-4">
-        <div class="card card-primary card-outline">
-            <div class="card-body box-profile">
+                <tr class="bg-light">
+                    <th colspan="2" class="text-center text-bold">DETAIL MAGANG</th>
+                </tr>
+                <tr>
+                    <th>Jenis Magang</th>
+                    <td><?= ucfirst($pendaftar->jenis_magang) ?></td>
+                </tr>
+                <tr>
+                    <th>Periode Magang</th>
+                    <td>
+                        <?php 
+                        // Format Tanggal Indonesia Sederhana
+                        $tgl_mulai = date('d-m-Y', strtotime($pendaftar->tgl_mulai));
+                        $tgl_selesai = date('d-m-Y', strtotime($pendaftar->tgl_selesai));
+                        ?>
+                        <?= $tgl_mulai ?> <span class="text-muted mx-1">s/d</span> <?= $tgl_selesai ?>
+                        <br>
+                        <small class="text-muted">(Durasi: <?= $pendaftar->durasi_bulan ?> Bulan)</small>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Status</th>
+                    <td>
+                        <?php 
+                        $status = $pendaftar->status;
+                        $badge_color = 'secondary';
+                        $status_label = ucfirst($status);
 
-                <h3 class="profile-username text-center"><?= $pendaftar->nama ?></h3>
-                <p class="text-muted text-center"><?= $pendaftar->jenis_peserta ?></p>
+                        switch ($status) {
+                            case 'pending':
+                                $badge_color = 'warning';
+                                $status_label = 'Menunggu Verifikasi';
+                                break;
+                            case 'diterima':
+                                $badge_color = 'info';
+                                break;
+                            case 'aktif':
+                                $badge_color = 'success';
+                                $status_label = 'Aktif Magang';
+                                break;
+                            case 'ditolak':
+                                $badge_color = 'danger';
+                                break;
+                            case 'selesai':
+                                $badge_color = 'primary';
+                                $status_label = 'Selesai Magang';
+                                break;
+                        }
+                        ?>
+                        <span class="badge badge-<?= $badge_color ?> text-md p-2">
+                            <?= $status_label ?>
+                        </span>
+                    </td>
+                </tr>
 
-                <ul class="list-group list-group-unbordered mb-3">
-                    <li class="list-group-item">
-                        <b>No WA</b> <span class="float-right"><?= $pendaftar->no_hp ?></span>
-                    </li>
-                    <li class="list-group-item">
-                        <b>Instansi</b> <span class="float-right"><?= $pendaftar->institusi ?></span>
-                    </li>
-                    <li class="list-group-item">
-                        <b>Jurusan</b> <span class="float-right"><?= $pendaftar->jurusan ?></span>
-                    </li>
-                </ul>
+                <?php 
+                if(in_array($pendaftar->status, ['diterima', 'aktif', 'selesai']) && !empty($pendaftar->user_id)): 
+                    // Ambil data user langsung dari view agar tidak perlu ubah controller
+                    $user_account = $this->db->get_where('users', ['id' => $pendaftar->user_id])->row();
+                    if($user_account):
+                ?>
+                <tr class="bg-white">
+                    <th colspan="2" class="text-center text-bold text-dark">
+                        <i class="fas fa-key"></i> AKUN LOGIN PESERTA
+                    </th>
+                </tr>
+                <tr>
+                    <th>Username</th>
+                    <td class="text-bold text-primary"><?= $user_account->username ?></td>
+                </tr>
+                <tr>
+                    <th>Password</th>
+                    <td>
+                        <span>123456</span>
+                        <br>
+                    </td>
+                </tr>
+                <?php 
+                    endif; 
+                endif; 
+                ?>
 
-                <?php if(!empty($akun)): ?>
-                <div class="alert alert-info">
-                    <strong>Info Akun Login</strong><br>
-                    Username: <?= $akun->username ?><br>
-                    Password Default: 123456
-                </div>
+                <tr class="bg-light">
+                    <th colspan="2" class="text-center text-bold">BERKAS DOKUMEN</th>
+                </tr>
+                <?php 
+                $docs = $this->db->get_where('dokumen', ['pendaftar_id' => $pendaftar->id])->result();
+                if(empty($docs)): ?>
+                    <tr>
+                        <td colspan="2" class="text-center text-muted">Tidak ada dokumen diupload</td>
+                    </tr>
+                <?php else: ?>
+                    <?php foreach($docs as $doc): ?>
+                    <tr>
+                        <th>
+                            <?= ucwords(str_replace('_', ' ', $doc->jenis_dokumen)) ?>
+                        </th>
+                        <td>
+                            <?php 
+                            // Tentukan folder berdasarkan jenis dokumen
+                            $folder = 'surat/';
+                            if($doc->jenis_dokumen == 'foto') $folder = 'foto/';
+                            if($doc->jenis_dokumen == 'cv') $folder = 'cv/';
+                            
+                            $file_url = base_url('assets/uploads/' . $folder . $doc->file_path);
+                            $file_path = FCPATH . 'assets/uploads/' . $folder . $doc->file_path;
+                            ?>
+
+                            <?php if(file_exists($file_path)): ?>
+                                <a href="<?= $file_url ?>" target="_blank" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-eye"></i> Lihat File
+                                </a>
+                            <?php else: ?>
+                                <span class="text-danger"><i class="fas fa-exclamation-triangle"></i> File tidak ditemukan</span>
+                            <?php endif; ?>
+                            
+                            <div class="text-muted text-xs mt-1">
+                                <?= $doc->file_name_original ?>
+                            </div>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
                 <?php endif; ?>
 
-            </div>
-        </div>
+            </tbody>
+        </table>
     </div>
-
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Dokumen Upload</h3>
-            </div>
-
-            <div class="card-body p-0">
-                <table class="table table-bordered table-striped">
-                    <thead>
-                        <tr>
-                            <th width="20%">Jenis</th>
-                            <th>Preview</th>
-                            <th width="15%">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-
-                        <?php foreach($dokumen as $d): 
-                            $folder = ($d->jenis_dokumen == 'foto') ? 'foto' : (($d->jenis_dokumen == 'cv') ? 'cv' : 'surat');
-                            $filepath = base_url('assets/uploads/'.$folder.'/'.$d->file_path);
-                            $ext = strtolower(pathinfo($d->file_path, PATHINFO_EXTENSION));
-                        ?>
-                        <tr>
-                            <td><?= strtoupper($d->jenis_dokumen) ?></td>
-                            <td>
-                                <?php if(in_array($ext, ['jpg','jpeg','png'])): ?>
-                                    <img src="<?= $filepath ?>" class="img-fluid" style="max-height:120px;border:1px solid #ddd;padding:2px">
-                                <?php elseif($ext == 'pdf'): ?>
-                                    <a href="#" onclick="window.open('<?= $filepath ?>','_blank','width=900,height=600');return false;">
-                                        <i class="fas fa-file-pdf text-danger fa-2x"></i>
-                                        <span class="ml-2">Preview PDF</span>
-                                    </a>
-                                <?php else: ?>
-                                    <span class="text-muted">
-                                        <i class="fas fa-file-word fa-2x"></i>
-                                        <span class="ml-2">DOCX (Download)</span>
-                                    </span>
-                                <?php endif; ?>
-                            </td>
-                            <td class="text-center">
-                                <a href="<?= $filepath ?>" target="_blank" download class="btn btn-sm btn-primary">
-                                    <i class="fas fa-download"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-
-                        <?php if(empty($dokumen)): ?>
-                        <tr>
-                            <td colspan="3" class="text-center text-muted">Belum ada dokumen</td>
-                        </tr>
-                        <?php endif; ?>
-
-                    </tbody>
-                </table>
-            </div>
-
-        </div>
-    </div>
-
 </div>

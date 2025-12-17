@@ -258,4 +258,41 @@ class Admin extends CI_Controller {
         }
         redirect('admin/broadcast');
     }
+
+	// --- TASK 1: DATA SEMUA PESERTA (Monitoring Full) ---
+    public function data_peserta()
+    {
+        $data['title'] = 'Data Semua Peserta';
+        
+        // Mengambil semua data tanpa filter status (kecuali user melakukan filter nanti di view)
+        $data['list'] = $this->db->select('pendaftar.*, users.username')
+            ->join('users', 'users.id = pendaftar.user_id', 'left')
+            ->order_by('pendaftar.id', 'DESC')
+            ->get('pendaftar')
+            ->result();
+
+        $this->render_view('admin/data_peserta', $data);
+    }
+
+    // --- TASK 2: MASTER FAKULTAS ---
+    public function master_fakultas() {
+        $data['title'] = 'Master Data Fakultas';
+        $data['list'] = $this->db->get('master_fakultas')->result();
+        $this->render_view('admin/master_fakultas', $data);
+    }
+
+    public function master_fakultas_add() {
+        $nama = $this->input->post('nama_fakultas');
+        if($nama) {
+            $this->db->insert('master_fakultas', ['nama_fakultas' => $nama]);
+            $this->session->set_flashdata('success', 'Fakultas berhasil ditambahkan');
+        }
+        redirect('admin/master_fakultas');
+    }
+
+    public function master_fakultas_delete($id) {
+        $this->db->delete('master_fakultas', ['id' => $id]);
+        $this->session->set_flashdata('success', 'Fakultas berhasil dihapus');
+        redirect('admin/master_fakultas');
+    }
 }

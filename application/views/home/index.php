@@ -229,11 +229,36 @@
                     </div>
 
                     <div id="form-step-2" class="space-y-8 hidden">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div>
-								<label class="block text-sm font-semibold text-gray-700 mb-2">Instansi / Universitas</label>
-								<input list="list-kampus" name="institusi" required class="w-full rounded-xl border-gray-300 px-5 py-3 border bg-gray-50 focus:bg-white transition" placeholder="Ketik untuk mencari...">
-								
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+							
+							<div class="md:col-span-2">
+								<div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+									<div class="flex">
+										<div class="ml-3">
+											<p class="text-sm text-yellow-700">
+												Masukan Nomor Surat Permohonan sesuai surat resmi dari Kampus/Sekolah. <br>
+												Contoh: <b>202/FILKOM/I.I/XI/2025</b>
+											</p>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div>
+								<label class="block text-sm font-semibold text-gray-700 mb-2">Nomor Surat Permohonan</label>
+								<input type="text" name="no_surat" required class="w-full rounded-xl border-gray-300 px-5 py-3 border bg-gray-50 focus:bg-white transition" placeholder="Nomor Surat Kampus/Sekolah">
+							</div>
+
+							<div>
+								<label class="block text-sm font-semibold text-gray-700 mb-2">Tanggal Surat Dibuat</label>
+								<input type="date" name="tgl_surat" required class="w-full rounded-xl border-gray-300 px-5 py-3 border bg-gray-50 focus:bg-white transition">
+							</div>
+
+							<div class="md:col-span-2 border-t pt-4"></div>
+
+							<div>
+								<label class="block text-sm font-semibold text-gray-700 mb-2">Instansi / Universitas / Sekolah</label>
+								<input list="list-kampus" name="institusi" required class="w-full rounded-xl border-gray-300 px-5 py-3 border bg-gray-50 focus:bg-white transition" placeholder="Ketik nama kampus/sekolah...">
 								<datalist id="list-kampus">
 									<?php foreach($kampus_list as $k): ?>
 										<option value="<?= $k->nama_institusi ?>">
@@ -241,52 +266,65 @@
 								</datalist>
 							</div>
 
-							<div>
-								<label class="block text-sm font-semibold text-gray-700 mb-2">Jurusan</label>
-								<input list="list-jurusan" name="jurusan" required class="w-full rounded-xl border-gray-300 px-5 py-3 border bg-gray-50 focus:bg-white transition" placeholder="Ketik jurusan...">
+							<div id="container-fakultas">
+								<label class="block text-sm font-semibold text-gray-700 mb-2">Fakultas</label>
+								<input list="list-fakultas" name="fakultas" id="input-fakultas" class="w-full rounded-xl border-gray-300 px-5 py-3 border bg-gray-50 focus:bg-white transition" placeholder="Pilih atau ketik fakultas...">
 								
+								<datalist id="list-fakultas">
+									<?php foreach($fakultas_list as $f): ?>
+										<option value="<?= $f->nama_fakultas ?>">
+									<?php endforeach; ?>
+								</datalist>
+								<small class="text-gray-500 text-xs mt-1">*Ketik manual jika tidak ada di list</small>
+							</div>
+
+							<div>
+								<label class="block text-sm font-semibold text-gray-700 mb-2">Jurusan / Program Studi</label>
+								<input list="list-jurusan" name="jurusan" required class="w-full rounded-xl border-gray-300 px-5 py-3 border bg-gray-50 focus:bg-white transition" placeholder="Cari jurusan...">
 								<datalist id="list-jurusan">
 									<?php foreach($jurusan_list as $j): ?>
 										<option value="<?= $j->nama_jurusan ?>">
 									<?php endforeach; ?>
 								</datalist>
 							</div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Rencana Tanggal Mulai</label>
-                                <input type="date" name="tgl_mulai" required class="w-full rounded-xl border-gray-300 px-5 py-3 border bg-gray-50 focus:bg-white focus:border-bps-light focus:ring-bps-light transition">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Rencana Tanggal Selesai</label>
-                                <input type="date" name="tgl_selesai" required class="w-full rounded-xl border-gray-300 px-5 py-3 border bg-gray-50 focus:bg-white focus:border-bps-light focus:ring-bps-light transition">
-                            </div>
-                             <div class="md:col-span-2">
-                                <label class="block text-sm font-semibold text-gray-700 mb-3">Jenis Permohonan Magang</label>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <label class="flex items-center p-4 border-2 rounded-xl cursor-pointer hover:bg-bps-soft hover:border-bps-light transition group">
-                                        <input type="radio" name="jenis_magang" value="wajib" checked class="w-5 h-5 text-bps-light focus:ring-bps-light border-gray-300">
-                                        <div class="ml-3">
-                                            <span class="block font-bold text-gray-800 group-hover:text-bps-dark">Magang Wajib / KKP</span>
-                                            <span class="block text-xs text-gray-500">Program wajib dari kampus/sekolah</span>
-                                        </div>
-                                    </label>
-                                    <label class="flex items-center p-4 border-2 rounded-xl cursor-pointer hover:bg-bps-soft hover:border-bps-light transition group">
-                                        <input type="radio" name="jenis_magang" value="mandiri" class="w-5 h-5 text-bps-light focus:ring-bps-light border-gray-300">
-                                        <div class="ml-3">
-                                            <span class="block font-bold text-gray-800 group-hover:text-bps-dark">Magang Mandiri</span>
-                                            <span class="block text-xs text-gray-500">Inisiatif pengembangan diri sendiri</span>
-                                        </div>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex justify-between pt-4">
-                            <button type="button" onclick="nextStep(1)" class="text-gray-500 font-semibold hover:text-bps-dark px-6 py-3 transition">Kembali</button>
-                            <button type="button" onclick="nextStep(3)" class="bg-bps-light text-white px-8 py-3 rounded-xl font-bold hover:bg-bps-dark transition shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center">
-                                Selanjutnya <i class="fas fa-arrow-right ml-2"></i>
-                            </button>
-                        </div>
-                    </div>
 
+							<div>
+								<label class="block text-sm font-semibold text-gray-700 mb-2">Rencana Tanggal Mulai</label>
+								<input type="date" name="tgl_mulai" required class="w-full rounded-xl border-gray-300 px-5 py-3 border bg-gray-50 focus:bg-white focus:border-bps-light focus:ring-bps-light transition">
+							</div>
+							<div>
+								<label class="block text-sm font-semibold text-gray-700 mb-2">Rencana Tanggal Selesai</label>
+								<input type="date" name="tgl_selesai" required class="w-full rounded-xl border-gray-300 px-5 py-3 border bg-gray-50 focus:bg-white focus:border-bps-light focus:ring-bps-light transition">
+							</div>
+
+							<div class="md:col-span-2">
+								<label class="block text-sm font-semibold text-gray-700 mb-3">Jenis Permohonan Magang</label>
+								<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+									<label class="flex items-center p-4 border-2 rounded-xl cursor-pointer hover:bg-bps-soft hover:border-bps-light transition group">
+										<input type="radio" name="jenis_magang" value="wajib" checked class="w-5 h-5 text-bps-light focus:ring-bps-light border-gray-300">
+										<div class="ml-3">
+											<span class="block font-bold text-gray-800 group-hover:text-bps-dark">Magang Wajib / KKP</span>
+											<span class="block text-xs text-gray-500">Program wajib dari kampus/sekolah</span>
+										</div>
+									</label>
+									<label class="flex items-center p-4 border-2 rounded-xl cursor-pointer hover:bg-bps-soft hover:border-bps-light transition group">
+										<input type="radio" name="jenis_magang" value="mandiri" class="w-5 h-5 text-bps-light focus:ring-bps-light border-gray-300">
+										<div class="ml-3">
+											<span class="block font-bold text-gray-800 group-hover:text-bps-dark">Magang Mandiri</span>
+											<span class="block text-xs text-gray-500">Inisiatif pengembangan diri sendiri</span>
+										</div>
+									</label>
+								</div>
+							</div>
+
+						</div>
+						<div class="flex justify-between pt-4">
+							<button type="button" onclick="nextStep(1)" class="text-gray-500 font-semibold hover:text-bps-dark px-6 py-3 transition">Kembali</button>
+							<button type="button" onclick="nextStep(3)" class="bg-bps-light text-white px-8 py-3 rounded-xl font-bold hover:bg-bps-dark transition shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center">
+								Selanjutnya <i class="fas fa-arrow-right ml-2"></i>
+							</button>
+						</div>
+					</div>
                     <div id="form-step-3" class="space-y-8 hidden">
                         <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 mb-6 flex items-start">
                             <i class="fas fa-info-circle text-blue-600 mt-1 mr-3 text-lg"></i>
@@ -516,12 +554,43 @@
             });
         }
     });
+
+	
         // Init AOS Animation
         AOS.init({
             once: true,
             offset: 100,
             duration: 800,
         });
+
+		const jenisPesertaSelect = document.getElementById('jenis_peserta');
+        const containerFakultas = document.getElementById('container-fakultas');
+        const inputFakultas = document.getElementById('input-fakultas');
+
+        function toggleFakultas() {
+            const jenis = jenisPesertaSelect.value;
+            
+            if (jenis === 'siswa') {
+                // Jika Siswa: Sembunyikan field & isi otomatis dengan "-"
+                containerFakultas.classList.add('hidden');
+                inputFakultas.value = '-';
+                inputFakultas.removeAttribute('required');
+            } else {
+                // Jika Mahasiswa: Tampilkan field & Reset jika isinya "-"
+                containerFakultas.classList.remove('hidden');
+                if(inputFakultas.value === '-') {
+                    inputFakultas.value = '';
+                }
+                inputFakultas.setAttribute('required', 'required');
+            }
+        }
+
+        // Panggil fungsi saat halaman dimuat (untuk handle jika ada error validation redirect)
+        if(jenisPesertaSelect) {
+            toggleFakultas();
+            // Panggil fungsi saat dropdown berubah
+            jenisPesertaSelect.addEventListener('change', toggleFakultas);
+        }
 
         // 1. UPDATE FILE NAME LABEL (Agar tidak terlihat kosong)
         function updateFileLabel(input, labelId, iconId, containerId) {
