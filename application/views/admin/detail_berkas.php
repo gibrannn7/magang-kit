@@ -208,27 +208,30 @@ function confirmAction(baseUrl, action) {
     let text  = action === 'terima'
         ? 'Akun login akan dibuat otomatis.'
         : 'Status peserta akan diubah menjadi Ditolak.';
-    let confirmBtnText = action === 'terima' ? 'Ya, Terima & Kirim WA' : 'Ya, Tolak & Kirim WA';
-    let denyBtnText    = action === 'terima' ? 'Terima Tanpa WA' : 'Tolak Tanpa WA';
-    let iconColor      = action === 'terima' ? '#28a745' : '#dc3545';
+    
+    // Tombol disesuaikan dengan permintaan: WA, Email, atau Batal
+    let confirmBtnText = '<i class="fab fa-whatsapp"></i> Terima & Kirim WA';
+    let denyBtnText    = '<i class="fas fa-envelope"></i> Terima & Kirim Email';
 
     Swal.fire({
         title: title,
-        text: text + ' Apakah ingin mengirim notifikasi WhatsApp?',
+        text: text + ' Pilih metode notifikasi yang ingin dikirimkan:',
         icon: 'question',
         showCancelButton: true,
         showDenyButton: true, 
-        confirmButtonColor: iconColor,
-        denyButtonColor: '#6c757d',
-        cancelButtonColor: '#d33',
-        confirmButtonText: '<i class="fab fa-whatsapp"></i> ' + confirmBtnText,
-        denyButtonText: '<i class="fas fa-eye-slash"></i> ' + denyBtnText,
+        confirmButtonColor: '#28a745', // Hijau untuk WA
+        denyButtonColor: '#007bff',    // Biru untuk Email
+        cancelButtonColor: '#d33',     // Merah untuk Batal
+        confirmButtonText: confirmBtnText,
+        denyButtonText: denyBtnText,
         cancelButtonText: 'Batal'
     }).then((result) => {
         if (result.isConfirmed) {
-            window.location.href = baseUrl + '/1'; 
+            // Parameter 'wa' untuk mengirim via WhatsApp
+            window.location.href = baseUrl + '/wa'; 
         } else if (result.isDenied) {
-            window.location.href = baseUrl + '/0';
+            // Parameter 'email' untuk mengirim via Brevo Email
+            window.location.href = baseUrl + '/email';
         }
     });
 }

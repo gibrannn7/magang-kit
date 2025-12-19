@@ -66,7 +66,6 @@ class Auth extends CI_Controller {
 
             $sess_data = [
                 'user_id' => $user->id,
-                'username' => $user->username, // Tetap simpan username di session jika ada logic lain yg butuh
                 'email' => $user->email,       // Tambahan session email
                 'role' => $user->role,
                 'nama_lengkap' => $user->nama_lengkap,
@@ -96,18 +95,11 @@ class Auth extends CI_Controller {
         redirect('auth/login');
     }
 
-    // Fungsi utility untuk reset password (hanya untuk development/debug)
-    public function fix_password()
-    {
-        $username = 'admin'; 
-        $password_baru = 'admin123'; 
-        
-        $hash = password_hash($password_baru, PASSWORD_DEFAULT);
-        
-        $this->db->where('username', $username);
-        $this->db->update('users', ['password' => $hash]);
-        
-        echo "<h1>Sukses!</h1>";
-        echo "Password reset done.";
-    }
+    public function fix_password() {
+
+		$email = 'admin@bps.go.id'; // Ganti identitas ke email
+		$this->db->where('email', $email);
+		$this->db->update('users', ['password' => password_hash('admin123', PASSWORD_DEFAULT)]);
+		echo "Password admin berhasil direset menggunakan Email.";
+	}
 }

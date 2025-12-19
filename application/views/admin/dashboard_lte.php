@@ -89,22 +89,22 @@
                             </td>
                             <td><?= $p->institusi ?></td>
                             <td>
-                                <a href="<?= base_url('admin/berkas/'.$p->id) ?>" class="btn btn-xs btn-info" title="Lihat Detail">
-                                    <i class="fas fa-eye"></i> Detail
-                                </a>
-                                <button type="button"
-                                        onclick="confirmAction('<?= base_url('admin/verifikasi/'.$p->id.'/diterima') ?>', 'terima')"
-                                        class="btn btn-xs btn-success"
-                                        title="Terima">
-                                    <i class="fas fa-check"></i> Terima
-                                </button>
-                                <button type="button"
-                                        onclick="confirmAction('<?= base_url('admin/verifikasi/'.$p->id.'/ditolak') ?>', 'tolak')"
-                                        class="btn btn-xs btn-danger"
-                                        title="Tolak">
-                                    <i class="fas fa-times"></i> Tolak
-                                </button>
-                            </td>
+								<a href="<?= base_url('admin/berkas/'.$p->id) ?>" class="btn btn-xs btn-info" title="Lihat Detail">
+									<i class="fas fa-eye"></i> Detail
+								</a>
+								<button type="button"
+										onclick="confirmAction('<?= base_url('admin/verifikasi/'.$p->id.'/diterima') ?>', 'terima')"
+										class="btn btn-xs btn-success"
+										title="Terima">
+									<i class="fas fa-check"></i> Terima
+								</button>
+								<button type="button"
+										onclick="confirmAction('<?= base_url('admin/verifikasi/'.$p->id.'/ditolak') ?>', 'tolak')"
+										class="btn btn-xs btn-danger"
+										title="Tolak">
+									<i class="fas fa-times"></i> Tolak
+								</button>
+							</td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -216,31 +216,44 @@ function confirmAction(baseUrl, action) {
     let text  = action === 'terima'
         ? 'Akun login akan dibuat otomatis.'
         : 'Status peserta akan diubah menjadi Ditolak.';
-    let confirmBtnText = action === 'terima' ? 'Ya, Terima & Kirim WA' : 'Ya, Tolak & Kirim WA';
-    let denyBtnText    = action === 'terima' ? 'Terima Tanpa WA' : 'Tolak Tanpa WA';
-    let iconColor      = action === 'terima' ? '#28a745' : '#dc3545';
-
-    Swal.fire({
-        title: title,
-        text: text + ' Apakah ingin mengirim notifikasi WhatsApp?',
-        icon: 'question',
-        showCancelButton: true,
-        showDenyButton: true, // Tombol Tambahan
-        confirmButtonColor: iconColor,
-        denyButtonColor: '#6c757d',
-        cancelButtonColor: '#d33',
-        confirmButtonText: '<i class="fab fa-whatsapp"></i> ' + confirmBtnText,
-        denyButtonText: '<i class="fas fa-eye-slash"></i> ' + denyBtnText,
-        cancelButtonText: 'Batal'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Pilihan YA (Kirim WA) -> Param ke-3 = 1
-            window.location.href = baseUrl + '/1'; 
-        } else if (result.isDenied) {
-            // Pilihan DENY (Tanpa WA) -> Param ke-3 = 0
-            window.location.href = baseUrl + '/0';
-        }
-    });
+    
+    // Konfigurasi tombol khusus untuk "Terima"
+    if (action === 'terima') {
+        Swal.fire({
+            title: title,
+            text: text + ' Pilih metode pengiriman notifikasi akun:',
+            icon: 'question',
+            showCancelButton: true,
+            showDenyButton: true, 
+            confirmButtonColor: '#28a745', // Hijau (WA)
+            denyButtonColor: '#007bff',    // Biru (Email)
+            cancelButtonColor: '#d33',
+            confirmButtonText: '<i class="fab fa-whatsapp"></i> Terima & Kirim WA',
+            denyButtonText: '<i class="fas fa-envelope"></i> Terima & Kirim Email',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = baseUrl + '/wa'; 
+            } else if (result.isDenied) {
+                window.location.href = baseUrl + '/email';
+            }
+        });
+    } else {
+        // Logika sederhana untuk "Tolak" (tetap via WA)
+        Swal.fire({
+            title: title,
+            text: text,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            confirmButtonText: 'Ya, Tolak!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = baseUrl + '/wa'; 
+            }
+        });
+    }
 }
 
 // Logic Tamatkan Magang

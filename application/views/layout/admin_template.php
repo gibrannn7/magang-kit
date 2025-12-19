@@ -78,9 +78,9 @@
 
     <div class="sidebar">
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-        <div class="image">
+        <!-- <div class="image">
            <img src="https://ui-avatars.com/api/?name=<?= urlencode($this->session->userdata('username')) ?>&background=random" class="img-circle elevation-2" alt="User Image">
-        </div>
+        </div> -->
         <div class="info">
           <a href="#" class="d-block text-white"><?= ucfirst($this->session->userdata('role')) ?></a>
         </div>
@@ -133,6 +133,12 @@
 								<a href="<?= base_url('admin/master_jurusan') ?>" class="nav-link <?= ($this->uri->segment(2)=='master_jurusan')?'active':'' ?>">
 										<i class="nav-icon fas fa-book"></i>
 										<p>Data Jurusan</p>
+								</a>
+						</li>
+						<li class="nav-item">
+								<a href="<?= base_url('admin/master_admin') ?>" class="nav-link">
+										<i class="nav-icon fas fa-user-shield"></i>
+										<p>Manajemen Admin</p>
 								</a>
 						</li>
 				<?php endif; ?>
