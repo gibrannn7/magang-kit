@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Magang BPS | <?= $title ?? 'Dashboard' ?></title>
+  <title>Sistem Informasi Magang & PKL | <?= $title ?? 'Dashboard' ?></title>
 
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
   <link rel="stylesheet" href="<?= base_url('assets/adminlte/plugins/fontawesome-free/css/all.min.css') ?>">
@@ -15,6 +15,35 @@
     .brand-link { background-color: #1e3a8a !important; }
     .sidebar-dark-primary { background-color: #0f172a !important; }
     .nav-pills .nav-link.active, .nav-pills .show>.nav-link { background-color: #0099CC !important; }
+		.brand-link {
+    background-color: #1e3a8a !important;
+    display: flex;
+    align-items: center;
+    height: 60px; /* kunci tinggi biar normal */
+  }
+
+  .brand-text {
+    font-size: 14px;
+    white-space: normal;
+    line-height: 1.2;
+
+    /* Batasi 2 baris saja */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+
+    overflow: hidden;
+    max-width: 160px;
+  }
+
+  .sidebar-dark-primary {
+    background-color: #0f172a !important;
+  }
+
+  .nav-pills .nav-link.active,
+  .nav-pills .show>.nav-link {
+    background-color: #0099CC !important;
+  }
   </style>
 </head>
 
@@ -38,9 +67,14 @@
 
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <a href="#" class="brand-link">
-      <img src="<?= base_url('assets/img/logo.png') ?>" alt="BPS" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light text-white">Magang BPS</span>
-    </a>
+			<img src="<?= base_url('assets/img/logo.png') ?>" 
+					alt="BPS" 
+					class="brand-image img-circle elevation-3" 
+					style="opacity: .8">
+			<span class="brand-text font-weight-light text-white">
+				Sistem Informasi Magang & PKL
+			</span>
+		</a>
 
     <div class="sidebar">
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">

@@ -43,7 +43,7 @@
 					class="h-44 w-auto mx-auto">
 			</div>
 
-            <h1 class="text-4xl font-bold text-white mb-2 tracking-tight">Sistem Informasi Magang</h1>
+            <h1 class="text-4xl font-bold text-white mb-2 tracking-tight">Sistem Informasi Magang & PKL</h1>
             <h2 class="text-xl text-gray-300 font-light uppercase tracking-widest mb-8">Badan Pusat Statistik Provinsi Banten</h2>
             
             <p class="text-gray-400 text-sm max-w-md mx-auto leading-relaxed">

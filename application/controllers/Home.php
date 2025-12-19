@@ -31,6 +31,7 @@ class Home extends CI_Controller {
 		$this->form_validation->set_rules('tgl_surat', 'Tanggal Surat', 'required');
 		$this->form_validation->set_rules('fakultas', 'Fakultas', 'required|trim');
 		$this->form_validation->set_rules('no_hp', 'Nomor WhatsApp', 'required|numeric|min_length[10]|max_length[15]');
+		$this->form_validation->set_rules('alamat', 'Alamat Domisili', 'required|trim');
 		$this->form_validation->set_rules('tgl_mulai', 'Tanggal Mulai', 'required');
 		$this->form_validation->set_rules('tgl_selesai', 'Tanggal Selesai', 'required');
 
@@ -78,6 +79,7 @@ class Home extends CI_Controller {
 			'fakultas' => $this->input->post('fakultas', TRUE),
 			'jurusan' => $this->input->post('jurusan', TRUE),
 			'no_hp' => $this->input->post('no_hp'),
+			'alamat' => $this->input->post('alamat', TRUE),
 			'jenis_magang' => $this->input->post('jenis_magang'),
 			'tgl_mulai' => $this->input->post('tgl_mulai'),
 			'tgl_selesai' => $this->input->post('tgl_selesai'),

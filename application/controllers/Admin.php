@@ -16,21 +16,34 @@ class Admin extends CI_Controller {
     }
 
     public function index()
-    {
-        $data['title'] = 'Dashboard Statistik';
+	{
+		$data['title'] = 'Dashboard Statistik';
+		$today = date('Y-m-d');
 
-        $data['total_daftar'] = $this->db->count_all('pendaftar');
-        $data['pending'] = $this->db->where('status', 'pending')->count_all_results('pendaftar');
-        $data['aktif'] = $this->db->where('status', 'diterima')->count_all_results('pendaftar');
+		// --- ROW 1: STATUS PENDAFTARAN ---
+		$data['total_daftar'] = $this->db->count_all('pendaftar');
+		$data['pending'] = $this->db->where('status', 'pending')->count_all_results('pendaftar');
+		$data['aktif'] = $this->db->where('status', 'diterima')->count_all_results('pendaftar');
+		$data['selesai'] = $this->db->where('status', 'selesai')->count_all_results('pendaftar'); // Data Alumni
 
-        $data['pendaftar'] = $this->db->select('pendaftar.*, users.username as akun_user')
-            ->join('users', 'users.id = pendaftar.user_id', 'left')
-            ->order_by('pendaftar.id', 'DESC')
-            ->get('pendaftar')
-            ->result();
+		// --- ROW 2: REKAP ABSEN HARI INI ---
+		// Tepat Waktu
+		$data['hadir'] = $this->db->where(['tanggal' => $today, 'status' => 'hadir'])->count_all_results('absensi');
+		// Terlambat
+		$data['telat'] = $this->db->where(['tanggal' => $today, 'status' => 'telat'])->count_all_results('absensi');
+		// Izin/Sakit
+		$data['absen_izin'] = $this->db->where(['tanggal' => $today, 'status' => 'izin'])->count_all_results('absensi');
+		// Belum Absen (Total Aktif - Semua yang sudah input data hari ini)
+		$data['belum_absen'] = max(0, $data['aktif'] - ($data['hadir'] + $data['telat'] + $data['absen_izin']));
 
-        $this->render_view('admin/dashboard_lte', $data);
-    }
+		$data['pendaftar'] = $this->db->select('pendaftar.*, users.username as akun_user')
+			->join('users', 'users.id = pendaftar.user_id', 'left')
+			->order_by('pendaftar.id', 'DESC')
+			->get('pendaftar')
+			->result();
+
+		$this->render_view('admin/dashboard_lte', $data);
+	}
 
     public function berkas($id)
     {
@@ -345,8 +358,8 @@ public function monitoring_absensi()
     $tanggal = $this->input->get('tanggal') ?: date('Y-m-d');
     $filter_status = $this->input->get('status');
 
-    // Query Mengambil Peserta Aktif dan Join Absensi
-    $this->db->select('u.id as user_id, p.nama, p.institusi, a.jam_datang, a.jam_pulang, a.status as absensi_status, a.bukti_izin, a.keterangan, a.jenis_izin');
+    // Mengambil semua peserta dengan status 'diterima' dan join ke tabel absensi pada tanggal tersebut
+    $this->db->select('u.id as user_id, p.nama, p.institusi, a.id as absensi_id, a.jam_datang, a.jam_pulang, a.status as absensi_status, a.bukti_izin, a.keterangan, a.jenis_izin');
     $this->db->from('users u');
     $this->db->join('pendaftar p', 'u.id = p.user_id'); 
     $this->db->join('absensi a', "u.id = a.user_id AND a.tanggal = '$tanggal'", 'left');
@@ -356,23 +369,32 @@ public function monitoring_absensi()
     $query_results = $this->db->get()->result();
 
     foreach ($query_results as $row) {
+        // Logika penentuan status tampilan dan class badge
         if (!$row->absensi_status) {
             $row->display_status = 'Belum Absen';
             $row->label_class = 'badge-secondary';
         } elseif ($row->absensi_status == 'izin') {
             $row->display_status = 'Izin (' . strtoupper($row->jenis_izin) . ')';
             $row->label_class = 'badge-warning';
-        } else {
-            $row->display_status = 'Masuk';
+        } elseif ($row->absensi_status == 'telat' || ($row->jam_datang > '08:00:00' && $row->absensi_status == 'hadir')) {
+            // Jika status di DB 'telat' ATAU jam datang > 08:00 meskipun status 'hadir'
+            $row->display_status = 'Terlambat';
+            $row->label_class = 'badge-danger';
+        } elseif ($row->absensi_status == 'hadir') {
+            $row->display_status = 'Hadir';
             $row->label_class = 'badge-success';
+        } else {
+            $row->display_status = ucfirst($row->absensi_status);
+            $row->label_class = 'badge-info';
         }
     }
 
+    // Filter status berdasarkan display_status
     if ($filter_status) {
         $query_results = array_filter($query_results, function($item) use ($filter_status) {
-            if ($filter_status == 'masuk') return ($item->display_status == 'Masuk');
-            if ($filter_status == 'izin') return (strpos($item->display_status, 'Izin') !== false);
-            if ($filter_status == 'belum') return ($item->display_status == 'Belum Absen');
+            if ($filter_status == 'masuk') return ($item->absensi_status == 'hadir' || $item->absensi_status == 'telat');
+            if ($filter_status == 'izin') return ($item->absensi_status == 'izin');
+            if ($filter_status == 'belum') return (empty($item->absensi_status));
             return true;
         });
     }
@@ -382,8 +404,37 @@ public function monitoring_absensi()
     $data['filter_status'] = $filter_status;
     $data['title'] = "Monitoring Absensi Harian";
 
-    // JANGAN memanggil header, navbar, footer secara manual di sini
-    // Gunakan fungsi render_view yang sudah ada di baris 12 Admin.php
     $this->render_view('admin/monitoring_absensi', $data);
+}
+
+public function save_absen_manual()
+{
+    $user_id = $this->input->post('user_id');
+    $tanggal = $this->input->post('tanggal');
+    $jam_datang = $this->input->post('jam_datang');
+    $jam_pulang = $this->input->post('jam_pulang');
+    $status = $this->input->post('status');
+
+    // Cek apakah sudah ada record di tabel absensi untuk user dan tanggal ini
+    $existing = $this->db->get_where('absensi', ['user_id' => $user_id, 'tanggal' => $tanggal])->row();
+
+    $data = [
+        'user_id'    => $user_id,
+        'tanggal'    => $tanggal,
+        'jam_datang' => $jam_datang ?: NULL,
+        'jam_pulang' => $jam_pulang ?: NULL,
+        'status'     => $status,
+        'keterangan' => 'Diinput manual oleh Admin'
+    ];
+
+    if ($existing) {
+        $this->db->where('id', $existing->id);
+        $this->db->update('absensi', $data);
+    } else {
+        $this->db->insert('absensi', $data);
+    }
+
+    $this->session->set_flashdata('success', 'Berhasil memperbarui absensi manual.');
+    redirect('admin/monitoring_absensi?tanggal=' . $tanggal);
 }
 }

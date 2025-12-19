@@ -5,7 +5,7 @@ class Peserta extends CI_Controller {
 
     const LAT_KANTOR = -6.171144960493601;
     const LONG_KANTOR = 106.1609483232592;
-    const MAX_RADIUS_METER = 100; 
+    const MAX_RADIUS_METER = 100;
 
     public function __construct() {
         parent::__construct();

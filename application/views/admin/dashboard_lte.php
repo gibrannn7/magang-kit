@@ -14,7 +14,48 @@
     <div class="col-lg-3 col-6">
         <div class="small-box bg-success">
             <div class="inner"><h3><?= $aktif ?></h3><p>Sedang Magang</p></div>
-            <div class="icon"><i class="fas fa-check"></i></div>
+            <div class="icon"><i class="fas fa-user-check"></i></div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-indigo">
+            <div class="inner"><h3><?= $selesai ?></h3><p>Alumni / Selesai</p></div>
+            <div class="icon"><i class="fas fa-graduation-cap"></i></div>
+        </div>
+    </div>
+</div>
+
+<h5 class="mb-3 mt-4"><i class="fas fa-calendar-alt mr-2"></i> Kehadiran Peserta Hari Ini (<?= date('d M Y') ?>)</h5>
+<div class="row">
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-success">
+            <div class="inner"><h3><?= $hadir ?></h3><p>Tepat Waktu</p></div>
+            <div class="icon"><i class="fas fa-check-circle"></i></div>
+            <a href="<?= base_url('admin/monitoring_absensi') ?>" class="small-box-footer">Detail <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-danger">
+            <div class="inner"><h3><?= $telat ?></h3><p>Terlambat</p></div>
+            <div class="icon"><i class="fas fa-history"></i></div>
+            <a href="<?= base_url('admin/monitoring_absensi') ?>" class="small-box-footer">Detail <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-warning">
+            <div class="inner"><h3><?= $absen_izin ?></h3><p>Izin / Sakit</p></div>
+            <div class="icon"><i class="fas fa-envelope-open-text"></i></div>
+            <a href="<?= base_url('admin/monitoring_absensi?status=izin') ?>" class="small-box-footer">Detail <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-secondary">
+            <div class="inner"><h3><?= $belum_absen ?></h3><p>Belum Absen</p></div>
+            <div class="icon"><i class="fas fa-user-slash"></i></div>
+            <a href="<?= base_url('admin/monitoring_absensi?status=belum') ?>" class="small-box-footer">Detail <i class="fas fa-arrow-circle-right"></i></a>
         </div>
     </div>
 </div>

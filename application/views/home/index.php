@@ -90,7 +90,7 @@
         <div class="max-w-5xl" data-aos="fade-up" data-aos-duration="1000">
             <div class="inline-block px-4 py-1 mb-4 border border-white/30 rounded-full bg-white/10 backdrop-blur-sm">
                 <span class="text-bps-accent font-semibold text-sm tracking-wide uppercase">
-                    <i class="fas fa-chart-pie mr-2"></i> Penerimaan Magang & PKL BPS
+                    <i class="fas fa-chart-pie mr-2"></i> Penerimaan Magang & PKL
                 </span>
             </div>
             <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight drop-shadow-xl">
@@ -226,12 +226,18 @@
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">NIM / NISN</label>
                                 <input type="number" name="nim_nis" required class="w-full rounded-xl border-gray-300 focus:border-bps-light focus:ring-bps-light px-5 py-3 border transition shadow-sm bg-gray-50 focus:bg-white">
                             </div>
-                        </div>
-                        <div class="flex justify-end pt-4">
-                            <button type="button" onclick="nextStep(2)" class="bg-bps-light text-white px-8 py-3 rounded-xl font-bold hover:bg-bps-dark transition shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center">
-                                Selanjutnya <i class="fas fa-arrow-right ml-2"></i>
-                            </button>
-                        </div>
+                        </div>	
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+							<div class="md:col-span-2">
+								<label class="block text-sm font-semibold text-gray-700 mb-2">Alamat Domisili (Sesuai KTP/Domisili Sekarang)</label>
+								<textarea name="alamat" id="alamat" required rows="3" class="w-full rounded-xl border-gray-300 focus:border-bps-light focus:ring-bps-light px-5 py-3 border transition shadow-sm bg-gray-50 focus:bg-white" placeholder="Jl. Nama Jalan No. 00, RT/RW, Kelurahan, Kecamatan, Kota/Kabupaten"></textarea>
+							</div>
+						</div>
+						<div class="flex justify-end pt-4">
+							<button type="button" id="btn-next-1" onclick="nextStep(2)" disabled class="bg-gray-400 text-white px-8 py-3 rounded-xl font-bold transition shadow-lg flex items-center cursor-not-allowed">
+								Selanjutnya <i class="fas fa-arrow-right ml-2"></i>
+							</button>
+						</div>
                     </div>
 
                     <div id="form-step-2" class="space-y-8 hidden">
@@ -326,7 +332,7 @@
 						</div>
 						<div class="flex justify-between pt-4">
 							<button type="button" onclick="nextStep(1)" class="text-gray-500 font-semibold hover:text-bps-dark px-6 py-3 transition">Kembali</button>
-							<button type="button" onclick="nextStep(3)" class="bg-bps-light text-white px-8 py-3 rounded-xl font-bold hover:bg-bps-dark transition shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center">
+							<button type="button" id="btn-next-2" onclick="nextStep(3)" disabled class="bg-gray-400 text-white px-8 py-3 rounded-xl font-bold transition shadow-lg flex items-center cursor-not-allowed">
 								Selanjutnya <i class="fas fa-arrow-right ml-2"></i>
 							</button>
 						</div>
@@ -367,7 +373,7 @@
                             </div>
 
                             <div class="group">
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Surat Pengantar Kampus/Sekolah <span class="text-red-500">*</span></label>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Surat Pengantar Universitas/Sekolah <span class="text-red-500">*</span></label>
                                 <div id="container-surat" class="relative border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-bps-light hover:bg-bps-soft transition cursor-pointer">
                                     <input type="file" name="file_surat" id="file_surat" accept=".pdf,.jpg,.jpeg,.png" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" onchange="updateFileLabel(this, 'label-surat', 'icon-surat', 'container-surat')">
                                     
@@ -467,7 +473,7 @@
                         <img src="<?= base_url('assets/img/logo.png') ?>" class="h-12 w-auto bg-white rounded p-1 shadow">
                         <div>
                             <h3 class="font-bold text-xl leading-none">Badan Pusat Statistik</h3>
-                            <span class="text-bps-accent text-2xl font-black tracking-widest">Provinsi BANTEN</span>
+                            <span class="text-bps-accent text-2xl font-black tracking-widest">Provinsi Banten</span>
                         </div>
                     </div>
                     <p class="text-gray-300 text-sm leading-relaxed max-w-sm">
@@ -750,5 +756,82 @@
         L.marker([-6.171144960493601, 106.1609483232592], {icon: customIcon}).addTo(map)
             .bindPopup('<b>BPS Provinsi Banten</b><br>KP3B Serang').openPopup();
     </script>
+	<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const form = document.getElementById('form-daftar');
+    
+    // Fungsi untuk cek kelengkapan Step 1
+    function validateStep1() {
+        const step1Inputs = [
+            'nama', 'email', 'no_hp', 'nim_nis', 'alamat'
+        ];
+        let isValid = true;
+        
+        step1Inputs.forEach(name => {
+            const input = form.querySelector(`[name="${name}"]`);
+            if (!input.value.trim()) isValid = false;
+        });
+
+        const btn = document.getElementById('btn-next-1');
+        if (isValid) {
+            btn.disabled = false;
+            btn.classList.remove('bg-gray-400', 'cursor-not-allowed');
+            btn.classList.add('bg-bps-light', 'hover:bg-bps-dark', 'transform', 'hover:-translate-y-1');
+        } else {
+            btn.disabled = true;
+            btn.classList.add('bg-gray-400', 'cursor-not-allowed');
+            btn.classList.remove('bg-bps-light', 'hover:bg-bps-dark', 'transform', 'hover:-translate-y-1');
+        }
+    }
+
+    // Fungsi untuk cek kelengkapan Step 2
+    function validateStep2() {
+        const step2Inputs = [
+            'no_surat', 'tgl_surat', 'institusi', 'jurusan', 'tgl_mulai', 'tgl_selesai'
+        ];
+        let isValid = true;
+        
+        step2Inputs.forEach(name => {
+            const input = form.querySelector(`[name="${name}"]`);
+            if (!input.value.trim()) isValid = false;
+        });
+
+        // Validasi khusus fakultas jika mahasiswa
+        const jenis = document.getElementById('jenis_peserta').value;
+        const fakultas = form.querySelector('[name="fakultas"]').value;
+        if (jenis === 'mahasiswa' && (!fakultas || fakultas === '-')) {
+            isValid = false;
+        }
+
+        const btn = document.getElementById('btn-next-2');
+        if (isValid) {
+            btn.disabled = false;
+            btn.classList.remove('bg-gray-400', 'cursor-not-allowed');
+            btn.classList.add('bg-bps-light', 'hover:bg-bps-dark', 'transform', 'hover:-translate-y-1');
+        } else {
+            btn.disabled = true;
+            btn.classList.add('bg-gray-400', 'cursor-not-allowed');
+            btn.classList.remove('bg-bps-light', 'hover:bg-bps-dark', 'transform', 'hover:-translate-y-1');
+        }
+    }
+
+    // Pasang Event Listener ke semua input di Step 1 dan 2
+    const allInputs = form.querySelectorAll('input, select, textarea');
+    allInputs.forEach(input => {
+        input.addEventListener('input', () => {
+            validateStep1();
+            validateStep2();
+        });
+        input.addEventListener('change', () => {
+            validateStep1();
+            validateStep2();
+        });
+    });
+
+    // Jalankan validasi awal saat page load
+    validateStep1();
+    validateStep2();
+});
+</script>
 </body>
 </html>
