@@ -98,6 +98,7 @@
 										title="Terima">
 									<i class="fas fa-check"></i> Terima
 								</button>
+
 								<button type="button"
 										onclick="confirmAction('<?= base_url('admin/verifikasi/'.$p->id.'/ditolak') ?>', 'tolak')"
 										class="btn btn-xs btn-danger"
@@ -210,52 +211,27 @@
 </div>
 
 <script>
-// Logic Konfirmasi Penerimaan/Penolakan
-function confirmAction(baseUrl, action) {
-    let title = action === 'terima' ? 'Terima Peserta Ini?' : 'Tolak Peserta Ini?';
-    let text  = action === 'terima'
-        ? 'Akun login akan dibuat otomatis.'
-        : 'Status peserta akan diubah menjadi Ditolak.';
+function confirmAction(url, action) {
+    const isAccept = action === 'terima';
     
-    // Konfigurasi tombol khusus untuk "Terima"
-    if (action === 'terima') {
-        Swal.fire({
-            title: title,
-            text: text + ' Pilih metode pengiriman notifikasi akun:',
-            icon: 'question',
-            showCancelButton: true,
-            showDenyButton: true, 
-            confirmButtonColor: '#28a745', // Hijau (WA)
-            denyButtonColor: '#007bff',    // Biru (Email)
-            cancelButtonColor: '#d33',
-            confirmButtonText: '<i class="fab fa-whatsapp"></i> Terima & Kirim WA',
-            denyButtonText: '<i class="fas fa-envelope"></i> Terima & Kirim Email',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = baseUrl + '/wa'; 
-            } else if (result.isDenied) {
-                window.location.href = baseUrl + '/email';
-            }
-        });
-    } else {
-        // Logika sederhana untuk "Tolak" (tetap via WA)
-        Swal.fire({
-            title: title,
-            text: text,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#dc3545',
-            confirmButtonText: 'Ya, Tolak!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = baseUrl + '/wa'; 
-            }
-        });
-    }
+    Swal.fire({
+        title: isAccept ? 'Konfirmasi Terima Peserta?' : 'Konfirmasi Tolak Peserta?',
+        html: isAccept 
+            ? 'Peserta akan dinyatakan <b>DITERIMA</b>.<br>Sistem akan membuat akun login otomatis dan menyiapkan draft surat balasan.' 
+            : 'Peserta akan dinyatakan <b>DITOLAK</b>.<br>Sistem akan menyiapkan draft surat penolakan resmi.',
+        icon: isAccept ? 'success' : 'warning',
+        showCancelButton: true,
+        confirmButtonColor: isAccept ? '#28a745' : '#dc3545', // Hijau vs Merah
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: isAccept ? '<i class="fas fa-check"></i> Ya, Terima!' : '<i class="fas fa-times"></i> Ya, Tolak!',
+        cancelButtonText: 'Batal',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = url;
+        }
+    });
 }
-
 // Logic Tamatkan Magang
 function confirmTamatkan(url) {
     Swal.fire({

@@ -78,7 +78,7 @@
         <tr>
             <td>Hal</td>
             <td>:</td>
-            <td>Penerimaan KKP Mahasiswa</td>
+            <td><?= ($pendaftar->status == 'diterima') ? 'Penerimaan KKP Mahasiswa' : 'Informasi Hasil Seleksi Magang' ?></td>
         </tr>
     </table>
 
@@ -116,11 +116,18 @@
         </tr>
     </table>
 
-    <p style="text-align: justify;">
-        Bersama ini disampaikan pada prinsipnya kami <b>tidak berkeberatan dan menerima</b>
-        mahasiswa tersebut untuk melaksanakan Kuliah Kerja Praktik di Badan Pusat Statistik
-        Provinsi Banten mulai tanggal <?= date('d F Y', strtotime($pendaftar->tgl_mulai)) ?> s.d <?= date('d F Y', strtotime($pendaftar->tgl_selesai)) ?>.
-    </p>
+    <?php if($pendaftar->status == 'diterima'): ?>
+        <p style="text-align: justify;">
+            Bersama ini disampaikan pada prinsipnya kami <b>tidak berkeberatan dan menerima</b>
+            mahasiswa tersebut untuk melaksanakan Kuliah Kerja Praktik di Badan Pusat Statistik
+            Provinsi Banten mulai tanggal <?= date('d F Y', strtotime($pendaftar->tgl_mulai)) ?> s.d <?= date('d F Y', strtotime($pendaftar->tgl_selesai)) ?>.
+        </p>
+    <?php else: ?>
+        <p style="text-align: justify;">
+            Bersama ini disampaikan bahwa berdasarkan hasil seleksi berkas dan ketersediaan kuota, dengan berat hati kami menginformasikan bahwa mahasiswa tersebut 
+            <b>belum dapat diterima</b> untuk melaksanakan Kuliah Kerja Praktik di Badan Pusat Statistik Provinsi Banten untuk periode yang diajukan.
+        </p>
+    <?php endif; ?>
 
     <p>
         Demikian disampaikan, atas perhatian dan kerjasamanya diucapkan terimakasih.

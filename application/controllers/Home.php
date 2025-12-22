@@ -3,28 +3,32 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Home extends CI_Controller {
 
+	public function __construct()
+    {
+        parent::__construct();
+        // Load model M_Home
+        $this->load->model('M_Home');
+    }
+
     public function index()
     {
         $data['title'] = 'Beranda';
 
-		$data['kampus_list'] = $this->db->get('master_institusi')->result();
-		$data['fakultas_list'] = $this->db->get('master_fakultas')->result();
-        $data['jurusan_list'] = $this->db->get('master_jurusan')->result();
+        // Refactor: Menggunakan Model
+		$data['kampus_list'] = $this->M_Home->get_all_institusi();
+		$data['fakultas_list'] = $this->M_Home->get_all_fakultas();
+        $data['jurusan_list'] = $this->M_Home->get_all_jurusan();
 
 		$this->load->view('home/index', $data);
     }
 
 	public function submit()
 	{
-		// 1. Validasi Input Dasar
+		// 1. Validasi Input Dasar (Tetap di Controller)
 		$this->form_validation->set_rules('nama', 'Nama Lengkap', 'required|trim|xss_clean');
-		
-		// UPDATE: Validasi Email
-		// Pastikan email belum terdaftar di tabel users maupun pendaftar
 		$this->form_validation->set_rules('email', 'Email', 'required|trim|valid_email|is_unique[users.email]|is_unique[pendaftar.email]', [
 			'is_unique' => 'Email ini sudah terdaftar. Silakan gunakan email lain atau login.'
 		]);
-		
 		$this->form_validation->set_rules('jenis_peserta', 'Jenis Peserta', 'required|in_list[mahasiswa,siswa]');
 		$this->form_validation->set_rules('nim_nis', 'NIM/NIS', 'required|trim');
 		$this->form_validation->set_rules('no_surat', 'Nomor Surat', 'required|trim');
@@ -41,14 +45,14 @@ class Home extends CI_Controller {
 			return;
 		}
 
-		// 2. Hitung Durasi (Bulan) - CODE LAMA TETAP SAMA
+		// 2. Hitung Durasi (Tetap di Controller)
 		$d1 = new DateTime($this->input->post('tgl_mulai'));
 		$d2 = new DateTime($this->input->post('tgl_selesai'));
 		$interval = $d1->diff($d2);
 		$durasi_bulan = $interval->m + ($interval->y * 12) + ($interval->d > 15 ? 1 : 0); 
 		if($durasi_bulan < 1) $durasi_bulan = 1;
 
-		// 3. Konfigurasi Upload - CODE LAMA TETAP SAMA
+		// 3. Konfigurasi Upload (Tetap di Controller)
 		$upload_cv = $this->_upload_file('file_cv', 'cv', 'pdf|doc|docx');
 		$upload_foto = $this->_upload_file('file_foto', 'foto', 'jpg|jpeg|png');
 		$upload_surat = $this->_upload_file('file_surat', 'surat', 'pdf|jpg|jpeg|png');
@@ -64,12 +68,9 @@ class Home extends CI_Controller {
 			return;
 		}
 
-		// 4. Database Transaction
-		$this->db->trans_start();
-
+		// 4. Persiapan Data untuk Model
 		$data_pendaftar = [
 			'nama' => $this->input->post('nama', TRUE),
-			// UPDATE: Simpan Email ke tabel pendaftar
 			'email' => $this->input->post('email', TRUE),
 			'jenis_peserta' => $this->input->post('jenis_peserta'),
 			'nim_nis' => $this->input->post('nim_nis'),
@@ -87,45 +88,38 @@ class Home extends CI_Controller {
 			'status' => 'pending'
 		];
 
-		$this->db->insert('pendaftar', $data_pendaftar);
-		$pendaftar_id = $this->db->insert_id();
-
-		// Insert Batch Dokumen (CODE LAMA TETAP SAMA)
-		$dokumen = [
+		$data_dokumen = [
 			[
-				'pendaftar_id' => $pendaftar_id,
 				'jenis_dokumen' => 'cv',
 				'file_path' => $upload_cv['file_name'],
 				'file_name_original' => $upload_cv['client_name']
 			],
 			[
-				'pendaftar_id' => $pendaftar_id,
-            'jenis_dokumen' => 'foto',
-            'file_path' => $upload_foto['file_name'],
-            'file_name_original' => $upload_foto['client_name']
-        ],
-        [
-            'pendaftar_id' => $pendaftar_id,
-            'jenis_dokumen' => 'surat_permohonan',
-            'file_path' => $upload_surat['file_name'],
-            'file_name_original' => $upload_surat['client_name']
-        ]
-    ];
-    $this->db->insert_batch('dokumen', $dokumen);
+                'jenis_dokumen' => 'foto',
+                'file_path' => $upload_foto['file_name'],
+                'file_name_original' => $upload_foto['client_name']
+            ],
+            [
+                'jenis_dokumen' => 'surat_permohonan',
+                'file_path' => $upload_surat['file_name'],
+                'file_name_original' => $upload_surat['client_name']
+            ]
+        ];
 
-    $this->db->trans_complete();
+        // 5. Eksekusi Simpan via Model (Refactor)
+        $simpan = $this->M_Home->simpan_pendaftaran($data_pendaftar, $data_dokumen);
 
-    if ($this->db->trans_status() === FALSE) {
-        $this->session->set_flashdata('error', 'Terjadi kesalahan sistem database.');
-        redirect('home#daftar');
-    } else {
-        // KIRIM NOTIFIKASI WA (CODE LAMA TETAP SAMA)
-        $pesan_wa = "Halo *{$data_pendaftar['nama']}*,\n\nPendaftaran magang Anda di BPS Banten telah diterima.\nNo. Surat: {$data_pendaftar['no_surat']}\n\nMohon tunggu proses SELEKSI dan verifikasi admin.";
-        $this->wa_client->send_message($data_pendaftar['no_hp'], $pesan_wa);
+        if ($simpan === FALSE) {
+            $this->session->set_flashdata('error', 'Terjadi kesalahan sistem database.');
+            redirect('home#daftar');
+        } else {
+            // KIRIM NOTIFIKASI WA
+            $pesan_wa = "Halo *{$data_pendaftar['nama']}*,\n\nPendaftaran magang Anda di BPS Banten telah diterima.\nNo. Surat: {$data_pendaftar['no_surat']}\n\nMohon tunggu proses SELEKSI dan verifikasi admin.";
+            $this->wa_client->send_message($data_pendaftar['no_hp'], $pesan_wa);
 
-        $this->session->set_flashdata('success', 'Pendaftaran Berhasil! Silakan tunggu konfirmasi via WhatsApp.');
-        redirect('home');
-    }
+            $this->session->set_flashdata('success', 'Pendaftaran Berhasil! Silakan tunggu konfirmasi via WhatsApp.');
+            redirect('home');
+        }
     }
 
 	private function _upload_file($field_name, $folder, $types)

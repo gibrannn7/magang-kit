@@ -1,38 +1,39 @@
 <?php
-$status_magang = $this->db
-    ->get_where('pendaftar', ['user_id' => $this->session->userdata('user_id')])
-    ->row()
-    ->status;
+// REFACTOR: Logic DB dihapus dari sini. 
+// Data diambil langsung dari variabel $pendaftar yang dikirim Controller.
+$status_magang = $pendaftar->status;
 ?>
 
 <div class="row">
-
     <div class="col-md-12">
         <h3 class="mb-3">
             Halo, <?= $this->session->userdata('nama_lengkap') ?>
         </h3>
 
-        <?php if($status_magang == 'selesai'): ?>
+        <?php if($status_magang == 'selesai' && !empty($pendaftar->file_sertifikat)): ?>
         <div class="alert alert-success alert-dismissible">
             <h5><i class="icon fas fa-check"></i> Selamat!</h5>
-            Magang Anda telah selesai. Sertifikat sudah terbit.
-            <a href="<?= base_url('peserta/download_sertifikat') ?>"
-               class="btn btn-light btn-sm ml-2 text-success font-weight-bold">
-               Download Sertifikat
+            Program magang Anda telah selesai. Sertifikat resmi sudah diterbitkan oleh Admin.
+            <br>
+            <a href="<?= base_url('assets/uploads/sertifikat/' . $pendaftar->file_sertifikat) ?>" 
+               target="_blank"
+               class="btn btn-light btn-sm mt-2 text-success font-weight-bold">
+               <i class="fas fa-download"></i> Download Sertifikat Resmi (PDF)
             </a>
+        </div>
+        <?php elseif($status_magang == 'selesai'): ?>
+        <div class="alert alert-info">
+            <h5><i class="icon fas fa-info-circle"></i> Info Sertifikat</h5>
+            Status magang Anda telah <b>Selesai</b>. Mohon tunggu Admin melakukan validasi dan upload sertifikat resmi Anda.
         </div>
         <?php endif; ?>
     </div>
-	<?php 
-// Ambil data pendaftar terbaru untuk user ini
-$pendaftar = $this->db->get_where('pendaftar', ['user_id' => $this->session->userdata('user_id')])->row();
 
-if($pendaftar && !empty($pendaftar->file_surat_balasan)): 
-?>
+    <?php if(!empty($pendaftar->file_surat_balasan)): ?>
     <div class="col-md-12 mb-3">
         <div class="alert alert-info">
-            <h5><i class="icon fas fa-envelope-open-text"></i> Surat Balasan Magang</h5>
-            Surat balasan resmi dari BPS Provinsi Banten telah terbit. Silakan unduh sebagai bukti penerimaan.
+            <h5><i class="icon fas fa-envelope-open-text"></i> Surat Balasan Magang Resmi</h5>
+            Surat balasan resmi dari BPS Provinsi Banten (E-Sign) telah tersedia. Silakan unduh sebagai bukti resmi penerimaan Anda.
             <br>
             <a href="<?= base_url('assets/uploads/surat_balasan/' . $pendaftar->file_surat_balasan) ?>" 
                target="_blank" 
@@ -41,7 +42,7 @@ if($pendaftar && !empty($pendaftar->file_surat_balasan)):
             </a>
         </div>
     </div>
-<?php endif; ?>
+    <?php endif; ?>
 
     <div class="col-md-12">
         <div class="card">
@@ -50,41 +51,28 @@ if($pendaftar && !empty($pendaftar->file_surat_balasan)):
             </div>
             <div class="card-body text-center">
                 <div class="row">
-
                     <div class="col-md-6 border-right">
                         <h5>ABSEN DATANG</h5>
                         <h1 class="font-weight-bold text-primary">
                             <?= isset($absensi->jam_datang) ? date('H:i', strtotime($absensi->jam_datang)) : '--:--' ?>
                         </h1>
-
                         <?php if(!isset($absensi->jam_datang)): ?>
-                            <a href="<?= base_url('peserta/absen_area') ?>"
-                               class="btn btn-primary btn-block mt-3">
-                                Absen Sekarang
-                            </a>
+                            <a href="<?= base_url('peserta/absen_area') ?>" class="btn btn-primary btn-block mt-3">Absen Sekarang</a>
                         <?php else: ?>
-                            <span class="badge badge-success mt-2">
-                                <?= strtoupper($absensi->status) ?>
-                            </span>
+                            <span class="badge badge-success mt-2"><?= strtoupper($absensi->status) ?></span>
                         <?php endif; ?>
                     </div>
-
                     <div class="col-md-6">
                         <h5>ABSEN PULANG</h5>
                         <h1 class="font-weight-bold text-danger">
                             <?= isset($absensi->jam_pulang) ? date('H:i', strtotime($absensi->jam_pulang)) : '--:--' ?>
                         </h1>
-
                         <?php if(isset($absensi->jam_datang) && !isset($absensi->jam_pulang)): ?>
-                            <a href="<?= base_url('peserta/absen_area') ?>"
-                               class="btn btn-danger btn-block mt-3">
-                                Absen Pulang
-                            </a>
+                            <a href="<?= base_url('peserta/absen_area') ?>" class="btn btn-danger btn-block mt-3">Absen Pulang</a>
                         <?php elseif(!isset($absensi->jam_datang)): ?>
                             <span class="text-muted">Absen datang terlebih dahulu</span>
                         <?php endif; ?>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -129,5 +117,4 @@ if($pendaftar && !empty($pendaftar->file_surat_balasan)):
             </div>
         </div>
     </div>
-
 </div>

@@ -59,29 +59,40 @@ const verifyApiKey = (req, res, next) => {
 
 // 1. Kirim Pesan Text
 app.post('/send-message', verifyApiKey, async (req, res) => {
-    const { number, message } = req.body;
+    const { number, message, file_url } = req.body; // Tambahkan file_url di sini
 
     if (!number || !message) {
         return res.status(400).json({ status: false, message: 'Parameter number dan message wajib diisi' });
     }
 
     try {
-        // Format Nomor: 08xx -> 628xx
         let formattedNumber = number.toString().replace(/\D/g, '');
         if (formattedNumber.startsWith('0')) {
             formattedNumber = '62' + formattedNumber.substr(1);
         }
         
-        // Tambahkan suffix @s.whatsapp.net
         if (!formattedNumber.endsWith('@s.whatsapp.net')) {
             formattedNumber += '@s.whatsapp.net';
         }
 
-        // Cek apakah nomor terdaftar di WA
         const [result] = await sock.onWhatsApp(formattedNumber);
         if (result?.exists) {
-            await sock.sendMessage(formattedNumber, { text: message });
-            return res.json({ status: true, message: 'Pesan terkirim', target: formattedNumber });
+            
+            // --- LOGIKA BARU: CEK APAKAH ADA FILE ---
+            if (file_url) {
+                // Jika ada file_url, kirim sebagai Document
+                await sock.sendMessage(formattedNumber, { 
+                    document: { url: file_url }, 
+                    mimetype: 'application/pdf',
+                    fileName: 'Surat_Balasan_BPS.pdf',
+                    caption: message 
+                });
+            } else {
+                // Jika tidak ada file, kirim teks biasa (seperti semula)
+                await sock.sendMessage(formattedNumber, { text: message });
+            }
+
+            return res.json({ status: true, message: 'Pesan & Lampiran terkirim', target: formattedNumber });
         } else {
             return res.status(404).json({ status: false, message: 'Nomor tidak terdaftar di WhatsApp' });
         }
@@ -92,7 +103,7 @@ app.post('/send-message', verifyApiKey, async (req, res) => {
     }
 });
 
-// Start Server
+// Start Servera
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`🚀 WA Server berjalan di port ${PORT}`);

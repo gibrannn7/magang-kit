@@ -53,10 +53,14 @@ application/logs/*
 !application/logs/index.html
 
 # =========================
-# Uploads (user files)
+# Assets & Uploads
 # =========================
-assets/uploads/
-assets/uploads/**
+
+assets/uploads/**/*
+!assets/uploads/**/.gitkeep
+
+assets/img/captcha/*
+!assets/img/captcha/.gitkeep
 
 # =========================
 # Environment
