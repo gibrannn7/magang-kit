@@ -141,10 +141,10 @@ public function upload_file_final() {
 
         // PESAN DINAMIS
         if ($pendaftar->status == 'diterima') {
-            $msg_wa = "Halo *{$pendaftar->nama}*,\n\nSelamat! Anda *DINYATAKAN DITERIMA* magang di BPS Banten.\n\nLogin Ke Sistem:\nEmail: *{$pendaftar->email}*\nPassword: *123456*\n\nSurat resmi terlampir.";
+            $msg_wa = "Halo *{$pendaftar->nama}*,\n\nSelamat! Anda *DINYATAKAN DITERIMA* magang di Krakatau Information Technology (KIT).\n\nLogin Ke Sistem:\nEmail: *{$pendaftar->email}*\nPassword: *123456*\n\nSurat resmi terlampir.";
             $msg_email = "<h3>Selamat, {$pendaftar->nama}!</h3><p>Anda diterima magang. Akun login:<br>Email: {$pendaftar->email}<br>Password: 123456</p>";
         } else {
-            $msg_wa = "Halo *{$pendaftar->nama}*,\n\nMohon maaf, Anda *BELUM DAPAT DITERIMA* magang di BPS Banten periode ini.\n\nTetap semangat! Surat resmi terlampir.";
+            $msg_wa = "Halo *{$pendaftar->nama}*,\n\nMohon maaf, Anda *BELUM DAPAT DITERIMA* magang di Krakatau Information Technology (KIT) periode ini.\n\nTetap semangat! Surat resmi terlampir.";
             $msg_email = "<h3>Halo, {$pendaftar->nama}</h3><p>Mohon maaf, pengajuan magang Anda <strong>BELUM DAPAT DITERIMA</strong>.</p>";
         }
 
@@ -153,9 +153,9 @@ public function upload_file_final() {
             $this->wa_client->send_message($pendaftar->no_hp, $msg_wa, $file_url);
         } else {
             $this->load->library('email');
-            $this->email->from('fatihmaulana8@gmail.com', 'BPS Banten');
+            $this->email->from('fatihmaulana8@gmail.com', 'Krakatau Information Technology (KIT)');
             $this->email->to($pendaftar->email);
-            $this->email->subject('Informasi Status Magang BPS Banten');
+            $this->email->subject('Informasi Status Magang Krakatau Information Technology (KIT)');
             $this->email->message($msg_email);
             $this->email->attach($file_path);
             $this->email->send();

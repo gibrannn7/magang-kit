@@ -114,7 +114,7 @@ class Home extends CI_Controller {
             redirect('home#daftar');
         } else {
             // KIRIM NOTIFIKASI WA
-            $pesan_wa = "Halo *{$data_pendaftar['nama']}*,\n\nPendaftaran magang Anda di BPS Banten telah diterima.\nNo. Surat: {$data_pendaftar['no_surat']}\n\nMohon tunggu proses SELEKSI dan verifikasi admin.";
+            $pesan_wa = "Halo *{$data_pendaftar['nama']}*,\n\nPendaftaran magang Anda di Krakatau Information Technology (KIT) telah diterima.\nNo. Surat: {$data_pendaftar['no_surat']}\n\nMohon tunggu proses SELEKSI dan verifikasi admin.";
             $this->wa_client->send_message($data_pendaftar['no_hp'], $pesan_wa);
 
             $this->session->set_flashdata('success', 'Pendaftaran Berhasil! Silakan tunggu konfirmasi via WhatsApp.');

@@ -3,9 +3,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Peserta extends CI_Controller {
 
-    const LAT_KANTOR = -6.171144960493601;
-    const LONG_KANTOR = 106.1609483232592;
-    const MAX_RADIUS_METER = 100;
+    const LAT_KANTOR = -6.01017945428719;
+    const LONG_KANTOR = 106.01626394194594;
+    const MAX_RADIUS_METER = 200;
 
     public function __construct() {
         parent::__construct();
@@ -14,7 +14,6 @@ class Peserta extends CI_Controller {
         }
         date_default_timezone_set('Asia/Jakarta'); 
 
-        // FIX ERROR: Load semua model yang dibutuhkan di sini
         $this->load->model('M_Peserta');
         $this->load->model('M_Absensi');
         $this->load->model('M_Auth'); 
@@ -298,7 +297,7 @@ class Peserta extends CI_Controller {
 
         $data = [
             'nama' => strtoupper($pendaftar->nama),
-            'periode_text' => "Sebagai peserta Praktikum Profesi Lapangan (PPL) di kantor Badan Pusat Statistik Provinsi Banten mulai tanggal $tgl_mulai_indo s.d $tgl_selesai_indo.",
+            'periode_text' => "Sebagai peserta Praktikum Profesi Lapangan (PPL) di kantor Krakatau Information Technology(KIT) mulai tanggal $tgl_mulai_indo s.d $tgl_selesai_indo.",
             'tanggal_sertifikat' => $tgl_sertif_indo,
             'background_base64' => $base64_bg // Kirim variable ini
         ];

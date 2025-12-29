@@ -84,11 +84,6 @@ class Auth extends CI_Controller {
         'font_size'     => 40,  // Ukuran font besar
         'img_id'        => 'captcha-img',
         'pool'          => '0123456789abcdefghijklmnopqrstuvwxyz',
-        
-        /* CATATAN: Agar font_size berfungsi maksimal dan teks terlihat tajam/besar, 
-           pastikan file font .ttf ada di folder system/fonts/ atau assets/.
-           Jika tidak ada, CI akan fallback ke font internal yang berukuran kecil.
-        */
         'font_path'     => FCPATH . 'system/fonts/texb.ttf', 
         
         'colors'        => [

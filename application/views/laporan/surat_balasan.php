@@ -49,11 +49,10 @@
                 <img src="<?= $base64 ?>" class="logo-bps">
             </td>
             <td class="kop-text">
-                <span class="kop-title">BADAN PUSAT STATISTIK</span><br>
-                <span class="kop-sub">PROVINSI BANTEN</span><br>
+                <span class="kop-title">KRAKATAU INFORMATION TECHNOLOGY</span><br>
                 <span class="kop-address">
                     Jl. Syeh Nawawi Al Bantani, Kawasan Pusat Pemerintahan Provinsi Banten (KP3B), Kav. H1-2 Serang Banten.<br>
-                    Telp: (0254) 267027. Email: bps3600@bps.go.id, Website: http://banten.bps.go.id
+                    Telp: (0254) 267027. Email: email@krakatau-it.co.id, Website: https://www.krakatau-it.co.id
                 </span>
             </td>
         </tr>
@@ -119,13 +118,12 @@
     <?php if($pendaftar->status == 'diterima'): ?>
         <p style="text-align: justify;">
             Bersama ini disampaikan pada prinsipnya kami <b>tidak berkeberatan dan menerima</b>
-            mahasiswa tersebut untuk melaksanakan Kuliah Kerja Praktik di Badan Pusat Statistik
-            Provinsi Banten mulai tanggal <?= date('d F Y', strtotime($pendaftar->tgl_mulai)) ?> s.d <?= date('d F Y', strtotime($pendaftar->tgl_selesai)) ?>.
+            mahasiswa tersebut untuk melaksanakan Kuliah Kerja Praktik di Krakatau Information Technology (KIT) mulai tanggal <?= date('d F Y', strtotime($pendaftar->tgl_mulai)) ?> s.d <?= date('d F Y', strtotime($pendaftar->tgl_selesai)) ?>.
         </p>
     <?php else: ?>
         <p style="text-align: justify;">
             Bersama ini disampaikan bahwa berdasarkan hasil seleksi berkas dan ketersediaan kuota, dengan berat hati kami menginformasikan bahwa mahasiswa tersebut 
-            <b>belum dapat diterima</b> untuk melaksanakan Kuliah Kerja Praktik di Badan Pusat Statistik Provinsi Banten untuk periode yang diajukan.
+            <b>belum dapat diterima</b> untuk melaksanakan Kuliah Kerja Praktik di Krakatau Information Technology (KIT) untuk periode yang diajukan.
         </p>
     <?php endif; ?>
 
@@ -134,11 +132,11 @@
     </p>
 
     <div class="ttd-box">
-        Serang, <?= date('d F Y') ?>
+        Cilegon, <?= date('d F Y') ?>
         <br>
-        Plt. Kepala BPS Provinsi Banten,
+        Plt. Kepala Jabatan KIT,
         <br><br><br><br><br>
-        <b>Ridwan Hidayat</b>
+        <b>Nama Pejabat KIT</b>
     </div>
 
     <div class="bsre-footer">

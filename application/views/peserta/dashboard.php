@@ -33,7 +33,7 @@ $status_magang = $pendaftar->status;
     <div class="col-md-12 mb-3">
         <div class="alert alert-info">
             <h5><i class="icon fas fa-envelope-open-text"></i> Surat Balasan Magang Resmi</h5>
-            Surat balasan resmi dari BPS Provinsi Banten (E-Sign) telah tersedia. Silakan unduh sebagai bukti resmi penerimaan Anda.
+            Surat balasan resmi dari Krakatau Information Technology (E-Sign) telah tersedia. Silakan unduh sebagai bukti resmi penerimaan Anda.
             <br>
             <a href="<?= base_url('assets/uploads/surat_balasan/' . $pendaftar->file_surat_balasan) ?>" 
                target="_blank" 

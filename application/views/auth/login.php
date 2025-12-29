@@ -64,15 +64,15 @@
 
     <div class="hidden lg:flex w-1/2 relative bg-gray-900 items-center justify-center overflow-hidden">
         <div class="absolute inset-0 z-0">
-            <img src="<?= base_url('assets/img/background.jpeg') ?>" class="w-full h-full object-cover opacity-40">
+            <img src="<?= base_url('assets/img/features.jpg') ?>" class="w-full h-full object-cover opacity-40">
             <div class="absolute inset-0 bg-gradient-to-br from-[#003366] to-black opacity-80"></div>
         </div>
         <div class="relative z-10 text-center px-12">
             <div class="mb-12">
-                <img src="<?= base_url('assets/img/logo.png') ?>" class="h-44 w-auto mx-auto">
+                <img src="<?= base_url('assets/img/logo2.png') ?>" class="h-44 w-auto mx-auto">
             </div>
             <h1 class="text-4xl font-bold text-white mb-2 tracking-tight">Sistem Informasi Magang & PKL</h1>
-            <h2 class="text-xl text-gray-300 font-light uppercase tracking-widest mb-8">Badan Pusat Statistik Provinsi Banten</h2>
+            <h2 class="text-xl text-gray-300 font-light uppercase tracking-widest mb-8">KRAKATAU INFORMATION TECHNOLOGY</h2>
             <p class="text-gray-400 text-sm max-w-md mx-auto leading-relaxed">
                 Platform terintegrasi untuk pendaftaran, seleksi, dan pengelolaan kegiatan magang secara digital.
             </p>
@@ -141,9 +141,6 @@
                     MASUK SEKARANG <i class="fas fa-arrow-right text-sm"></i>
                 </button>
             </form>
-            <div class="mt-8 pt-6 border-t border-gray-100 text-center">
-                <p class="text-xs text-gray-400">&copy; <?= date('Y') ?> BPS Provinsi Banten. All rights reserved.</p>
-            </div>
         </div>
     </div>
 

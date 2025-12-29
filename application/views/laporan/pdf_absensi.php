@@ -29,11 +29,10 @@ $logoBase64 = base64_encode(file_get_contents($logoPath));
 <img src="data:image/png;base64,<?= $logoBase64 ?>" class="logo-bps">
             </td>
             <td class="kop-text">
-                <span class="kop-title">BADAN PUSAT STATISTIK</span><br>
-                <span class="kop-sub">PROVINSI BANTEN</span><br>
+                <span class="kop-title">KRAKATAU INFORMATION TECHNOLOGY</span><br>
                 <span class="kop-address">
-					Jl. Syeh Nawawi Al Bantani, Kawasan Pusat Pemerintahan Provinsi Banten (KP3B), Kav. H1-2 Serang Banten.<br>
-					Telp: (0254) 267027. Email: <span style="color: blue; text-decoration: underline;">bps3600@bps.go.id</span>, Website: http://banten.bps.go.id
+					Gedung Krakatau IT, Jl. Raya Anyer No.Km.3, Warnasari, Citangkil, Cilegon, Banten 42441.<br>
+					Telp: (+62) 81110555605. Email: <span style="color: blue; text-decoration: underline;">email@@krakatau-it.co.id</span>, Website: https://www.krakatau-it.co.id/
 				</span>
             </td>
         </tr>
@@ -47,7 +46,7 @@ $logoBase64 = base64_encode(file_get_contents($logoPath));
     <table>
         <tr><td width="100">Nama</td><td>: <b><?= $peserta->nama_lengkap ?></b></td></tr>
         <tr><td>Instansi</td><td>: <?= $detail->institusi ?></td></tr>
-        <tr><td>Unit Kerja</td><td>: BPS Provinsi Banten</td></tr>
+        <tr><td>Unit Kerja</td><td>: Krakatau Information Technology</td></tr>
     </table>
 
     <table class="data">
@@ -76,10 +75,10 @@ $logoBase64 = base64_encode(file_get_contents($logoPath));
     </table>
 
     <div style="float: right; width: 200px; margin-top: 40px; text-align: center;">
-        Serang, <?= date('d F Y') ?><br>
-        Kepala Bagian Umum,<br><br><br><br>
-        <b>Ridwan Hidayat</b><br>
-        NIP. 1980xxxx
+        Cilegon, <?= date('d F Y') ?><br>
+        Jabatan,<br><br><br><br>
+        <b>Nama Pejabat</b><br>
+        Nip. Pejabat
     </div>
 </body>
 </html>

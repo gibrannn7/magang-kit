@@ -17,8 +17,8 @@ async function connectToWhatsApp() {
 
     sock = makeWASocket({
         auth: state,
-        printQRInTerminal: true, // Ubah false jika ingin QR tampil di respon API (opsional)
-        browser: ["Sistem Magang BPS", "Chrome", "1.0.0"]
+        printQRInTerminal: true, 
+        browser: ["Sistem Magang KIT", "Chrome", "1.0.0"]
     });
 
     sock.ev.on('connection.update', (update) => {
@@ -36,7 +36,7 @@ async function connectToWhatsApp() {
                 connectToWhatsApp();
             }
         } else if (connection === 'open') {
-            console.log('✅ WhatsApp Terhubung Siap Menerima Request!');
+            console.log('WhatsApp Terhubung Siap Menerima Request!');
         }
     });
 
@@ -106,5 +106,5 @@ app.post('/send-message', verifyApiKey, async (req, res) => {
 // Start Servera
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`🚀 WA Server berjalan di port ${PORT}`);
+    console.log(`WA Server berjalan di port ${PORT}`);
 });

@@ -67,13 +67,10 @@
 
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <a href="#" class="brand-link">
-			<img src="<?= base_url('assets/img/logo.png') ?>" 
-					alt="BPS" 
-					class="brand-image img-circle elevation-3" 
-					style="opacity: .8">
-			<span class="brand-text font-weight-light text-white">
-				Sistem Informasi Magang & PKL
-			</span>
+			<img src="<?= base_url('assets/img/logo2.png') ?>" 
+         alt="KIT Logo" 
+         class="brand-image elevation-0" 
+         style="opacity: .9; margin-left: 10px; max-height: 35px;">
 		</a>
 
     <div class="sidebar">
@@ -197,7 +194,7 @@
   </div>
 
   <footer class="main-footer">
-    <strong>&copy; 2025 <a href="#">BPS Provinsi Banten</a>.</strong>
+    <strong>&copy; 2025 <a href="#">KRAKATAU INFORMATION TECHNOLOGY</a>.</strong>
   </footer>
 </div>
 
