@@ -202,7 +202,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `email`, `password`, `role_id`, `divisi_id`, `lokasi_id`, `role`, `nama_lengkap`, `created_at`, `last_login`) VALUES
-(1, 'admin@kit.go.id', '$2y$10$D1wf5FYzOCyZja3CeDJKZeFB1L4QmTxVTeK/K5wUwO9HXZXNfyZFK', 1, 6, admin, 'admin', 'Administrator KIT', '2025-12-15 15:49:01', '2025-12-19 22:13:23');
+(1, 'admin@kit.go.id', '$2y$10$D1wf5FYzOCyZja3CeDJKZeFB1L4QmTxVTeK/K5wUwO9HXZXNfyZFK', 1, 6, NULL, 'admin', 'Administrator KIT', '2025-12-15 15:49:01', '2025-12-19 22:13:23');
 
 --
 -- Indexes for dumped tables
