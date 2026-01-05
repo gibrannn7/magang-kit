@@ -3,10 +3,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Peserta extends CI_Controller {
 
-    const LAT_KANTOR = -6.01017945428719;
-    const LONG_KANTOR = 106.01626394194594;
-    const MAX_RADIUS_METER = 200;
-
     public function __construct() {
         parent::__construct();
         if (!$this->session->userdata('logged_in') || $this->session->userdata('role') !== 'peserta') {
@@ -29,13 +25,19 @@ class Peserta extends CI_Controller {
 		$user_id = $this->session->userdata('user_id');
 		$today = date('Y-m-d');
 
-		// Mengambil data melalui model (Logika terpusat di M_Peserta)
 		$dashboard = $this->M_Peserta->get_dashboard_data($user_id, $today);
 		
+		// TAMBAHKAN: Ambil detail lokasi untuk peta
+		$this->db->select('master_lokasi.*');
+		$this->db->from('users');
+		$this->db->join('master_lokasi', 'master_lokasi.id = users.lokasi_id');
+		$this->db->where('users.id', $user_id);
+		$data['lokasi_absen'] = $this->db->get()->row();
+
 		$data['absensi']    = $dashboard['absensi'];
 		$data['riwayat']    = $dashboard['riwayat'];
-		$data['pendaftar']  = $dashboard['pendaftar']; // Berisi status & file_surat_balasan
-		$data['title']      = 'Dashboard Peserta';
+		$data['pendaftar']  = $dashboard['pendaftar'];
+		$data['title'] = $this->session->userdata('nama_lengkap') . ' | ' . strtoupper($this->session->userdata('role'));
 
 		$this->render_view('peserta/dashboard', $data);
 	}
@@ -46,176 +48,83 @@ class Peserta extends CI_Controller {
         $this->render_view('peserta/absen_form', $data);
     }
 	
-    public function submit_absen()
+   public function submit_absen()
 {
-    // Set Header JSON agar browser tahu ini respon data, bukan HTML
-    header('Content-Type: application/json');
+    $user_id = $this->session->userdata('user_id');
+    $is_izin = $this->input->post('is_izin') === 'true';
 
-    // Siapkan response default + Token CSRF Baru (PENTING untuk AJAX)
-    $response = [
-        'status' => false, 
-        'message' => 'Unknown Error',
-        'csrf_token' => $this->security->get_csrf_hash() 
-    ];
+    // Logika untuk Izin/Sakit (Menggunakan Upload File Fisik)
+    if ($is_izin) {
+        $config['upload_path']   = './assets/uploads/absensi/';
+        $config['allowed_types'] = 'jpg|jpeg|png';
+        $config['encrypt_name']  = TRUE;
+        $this->load->library('upload', $config);
 
-    try {
-        $user_id = $this->session->userdata('user_id');
-        $is_izin = $this->input->post('is_izin');
-
-        // --- LOGIC IZIN / SAKIT ---
-        if ($is_izin === 'true') {
-            $tgl_mulai   = $this->input->post('tgl_mulai');
-            $tgl_selesai = $this->input->post('tgl_selesai');
-            $jenis_izin  = $this->input->post('jenis_izin');
-            $keterangan  = $this->input->post('keterangan');
-
-            // Validasi input izin
-            if (empty($tgl_mulai) || empty($tgl_selesai) || empty($jenis_izin) || empty($keterangan)) {
-                throw new Exception('Semua data izin wajib diisi!');
-            }
-
-            // 1. Upload Bukti Izin
-            $config['upload_path']   = './assets/uploads/absensi/';
-            $config['allowed_types'] = 'jpg|jpeg|png';
-            $config['encrypt_name']  = TRUE;
-            $this->load->library('upload', $config);
-
-            $nama_file_bukti = NULL;
-            if ($this->upload->do_upload('bukti_file')) {
-                $nama_file_bukti = $this->upload->data('file_name');
-            } else {
-                throw new Exception('Gagal upload bukti: ' . $this->upload->display_errors('',''));
-            }
-
-            // 2. Logika Looping Tanggal
-            $begin = new DateTime($tgl_mulai);
-            $end   = new DateTime($tgl_selesai);
-            $end->modify('+1 day'); // Agar tanggal selesai ikut terhitung
-
-            $interval = DateInterval::createFromDateString('1 day');
-            $period   = new DatePeriod($begin, $interval, $end);
-
-            // Persiapkan data batch
-            $data_batch = [];
-            foreach ($period as $dt) {
-                $curr_date = $dt->format("Y-m-d");
-                
-                // Lewati jika Sabtu/Minggu (Optional, silakan hapus jika tetap ingin dicatat)
-                if ($dt->format('N') >= 6) continue;
-
-                // REFACTOR: Gunakan check_existing_absen dari M_Absensi
-                $exists = $this->M_Absensi->check_existing_absen($user_id, $curr_date);
-                if (!$exists) {
-                    $data_batch[] = [
-                        'user_id' => $user_id,
-                        'tanggal' => $curr_date,
-                        'status' => 'izin',
-                        'jenis_izin' => $jenis_izin,
-                        'keterangan' => $keterangan,
-                        'bukti_izin' => $nama_file_bukti,
-                        'jam_datang' => '00:00:00',
-                        'jam_pulang' => '00:00:00'
-                    ];
-                }
-            }
-
-            // Insert batch jika ada data
-            $count_inserted = 0;
-            if (!empty($data_batch)) {
-                $count_inserted = $this->M_Absensi->insert_izin_batch($data_batch);
-            }
-
-            $response['status'] = true;
-            $response['message'] = "Berhasil mengajukan izin selama $count_inserted hari kerja.";
-            echo json_encode($response);
-            return;
+        if (!$this->upload->do_upload('bukti_file')) {
+            $response = ['status' => false, 'message' => $this->upload->display_errors('', '')];
+        } else {
+            $file = $this->upload->data('file_name');
+            $data_izin = [
+                'user_id'     => $user_id,
+                'tanggal'     => $this->input->post('tgl_mulai'),
+                'status'      => 'izin',
+                'jenis_izin'  => $this->input->post('jenis_izin'),
+                'keterangan'  => $this->input->post('keterangan'),
+                'foto_datang' => $file
+            ];
+            $this->M_Absensi->save_absen($data_izin);
+            $response = ['status' => true, 'message' => 'Permohonan izin berhasil dikirim'];
         }
-
-        // --- LOGIC ABSEN HADIR ---
-        // 1. Cek Hari (Sabtu=6, Minggu=7 Libur)
-        $hari_ini = date('N'); 
-        if ($hari_ini >= 6) { 
-            throw new Exception('Hari Libur: Absensi tidak dapat dilakukan.');
-        }
-
-        // 2. Cek Jam
-        $now = date('H:i:s');
-        // Untuk testing saya set 06:00, sesuaikan kebutuhan
-        if ($now < '06:00:00') {
-            throw new Exception('Absensi belum dibuka. Dimulai pukul 06:00 WIB.');
-        }
-
-        $today = date('Y-m-d');
-
-        $lat_user = $this->input->post('latitude');
-        $long_user = $this->input->post('longitude');
+    } 
+    else {
         $tipe = $this->input->post('tipe');
+        $lat  = $this->input->post('lat'); // Menggunakan 'lat' sesuai input JS nanti
+        $long = $this->input->post('long');
         $foto_base64 = $this->input->post('foto');
 
-        // Validasi Input
-        if (empty($lat_user) || empty($long_user) || empty($foto_base64)) {
-            throw new Exception('Lokasi atau Foto kosong. Pastikan GPS aktif dan izin kamera diberikan.');
-        }
+        // Ambil data parameter Geofencing
+        $user = $this->db->get_where('users', ['id' => $user_id])->row();
+        $lokasi = $this->db->get_where('master_lokasi', ['id' => $user->lokasi_id])->row();
 
-        // Validasi Jarak
-        $jarak_meter = $this->haversineGreatCircleDistance(self::LAT_KANTOR, self::LONG_KANTOR, $lat_user, $long_user);
-        if ($jarak_meter > self::MAX_RADIUS_METER) {
-            throw new Exception('Jarak terlalu jauh (' . round($jarak_meter) . 'm). Wajib di area kantor (Max ' . self::MAX_RADIUS_METER . 'm).');
-        }
+        if (!$lokasi) {
+            $response = ['status' => false, 'message' => 'Titik lokasi absen belum ditentukan admin.'];
+        } else {
+            // Hitung Jarak (Logika Anda tetap terjaga)
+            $jarak = $this->getDistanceBetweenPointsNew($lat, $long, $lokasi->latitude, $lokasi->longitude);
 
-        // REFACTOR: Gunakan M_Absensi untuk cek data
-        $cek = $this->M_Absensi->check_existing_absen($user_id, $today);
+            if ($jarak > $lokasi->radius_meter) {
+                $response = ['status' => false, 'message' => 'Anda berada di luar radius (' . round($jarak) . 'm).'];
+            } else {
+                // Simpan Foto dari Base64 Webcam
+                $foto_name = $this->_save_base64_image($foto_base64, $tipe);
+                
+                if (!$foto_name) {
+                    $response = ['status' => false, 'message' => 'Gagal menyimpan foto snapshot.'];
+                } else {
+                    $data_absen = ['user_id' => $user_id, 'tanggal' => date('Y-m-d')];
 
-        if ($tipe === 'datang') {
-            if ($cek) {
-                throw new Exception('Anda sudah absen datang hari ini.');
+                    if ($tipe == 'datang') {
+                        $data_absen['jam_datang']  = date('H:i:s');
+                        $data_absen['lat_datang']  = $lat;
+                        $data_absen['long_datang'] = $long;
+                        $data_absen['foto_datang'] = $foto_name;
+                        $data_absen['status']      = (date('H:i:s') > '08:00:00') ? 'telat' : 'hadir';
+                        $this->M_Absensi->save_absen($data_absen);
+                    } else {
+                        $data_update = [
+                            'jam_pulang'  => date('H:i:s'),
+                            'lat_pulang'  => $lat,
+                            'long_pulang' => $long,
+                            'foto_pulang' => $foto_name
+                        ];
+                        $this->M_Absensi->update_absen($user_id, date('Y-m-d'), $data_update);
+                    }
+                    $response = ['status' => true, 'message' => 'Absensi ' . $tipe . ' berhasil dicatat!'];
+                }
             }
-
-            // Upload Foto
-            $foto = $this->_save_base64_image($foto_base64, 'datang');
-            if (!$foto) throw new Exception('Gagal menyimpan foto ke server.');
-
-            $status = ($now > '08:00:00') ? 'telat' : 'hadir';
-
-            // REFACTOR: Gunakan M_Absensi
-            $this->M_Absensi->insert_absen([
-                'user_id' => $user_id,
-                'tanggal' => $today,
-                'jam_datang' => $now,
-                'lat_datang' => $lat_user,
-                'long_datang' => $long_user,
-                'foto_datang' => $foto,
-                'status' => $status
-            ]);
-
-        } elseif ($tipe === 'pulang') {
-            if (!$cek) throw new Exception('Anda belum absen datang.');
-            if ($cek->jam_pulang != NULL) throw new Exception('Anda sudah absen pulang hari ini.');
-
-            $jam_pulang_min = ($hari_ini == 5) ? '16:30:00' : '16:00:00'; 
-            if ($now < $jam_pulang_min) {
-                // throw new Exception('Belum jam pulang (' . $jam_pulang_min . ').'); // Uncomment jika ketat
-            }
-
-            $foto = $this->_save_base64_image($foto_base64, 'pulang');
-            if (!$foto) throw new Exception('Gagal menyimpan foto ke server.');
-
-            // REFACTOR: Gunakan M_Absensi
-            $this->M_Absensi->update_absen($cek->id, [
-                'jam_pulang' => $now,
-                'lat_pulang' => $lat_user,
-                'long_pulang' => $long_user,
-                'foto_pulang' => $foto
-            ]);
         }
-
-        $response['status'] = true;
-        $response['message'] = 'Absensi Berhasil! Jarak: ' . round($jarak_meter) . 'm';
-
-    } catch (Exception $e) {
-        $response['status'] = false;
-        $response['message'] = $e->getMessage();
     }
+    $response['csrf_token'] = $this->security->get_csrf_hash();
 
     echo json_encode($response);
 }
@@ -252,7 +161,7 @@ class Peserta extends CI_Controller {
         // Buat folder jika belum ada
         if (!is_dir($folder)) {
             if (!mkdir($folder, 0777, true)) {
-                return false; // Gagal buat folder
+                return false;
             }
         }
 
@@ -281,7 +190,6 @@ class Peserta extends CI_Controller {
         $tgl_selesai_indo = date('j', $ts) . ' ' . $bulan[(int)date('n', $ts)] . ' ' . date('Y', $ts);
         $tgl_sertif_indo = 'Serang, ' . date('j') . ' ' . $bulan[(int)date('n')] . ' ' . date('Y');
 
-        // --- PERBAIKAN HANDLING GAMBAR DISINI ---
         $path_img = FCPATH . 'assets/templates/sertifikat_clean.jpg';
         
         // Cek apakah file ada?
@@ -326,8 +234,6 @@ class Peserta extends CI_Controller {
         $new_pass = trim($this->input->post('new_password', FALSE));
         $conf_pass = trim($this->input->post('conf_password', FALSE));
         $user_id = $this->session->userdata('user_id');
-
-        // REFACTOR: Gunakan M_Auth
         $user = $this->M_Auth->get_user_by_id($user_id);
 
         if (!$user || !password_verify($old_pass, $user->password)) {
@@ -342,7 +248,6 @@ class Peserta extends CI_Controller {
             return;
         }
 
-        // REFACTOR: Gunakan M_Auth
         $this->M_Auth->update_user($user_id, ['password' => password_hash($new_pass, PASSWORD_DEFAULT)]);
 
         $this->session->set_flashdata('success', 'Password berhasil diperbarui!');
@@ -356,5 +261,29 @@ class Peserta extends CI_Controller {
         $data['absensi'] = $this->M_Absensi->get_absensi_by_user($user_id);
         $data['title'] = 'Riwayat Absensi Lengkap';
         $this->render_view('peserta/riwayat_absensi', $data);
+    }
+	/**
+     * Menghitung jarak antara dua titik koordinat (Haversine Formula)
+     * @param float $latitude1, $longitude1 (Posisi User dari Browser/GPS)
+     * @param float $latitude2, $longitude2 (Posisi Kantor dari Database)
+     * @return float Jarak dalam satuan Meter
+     */
+    private function getDistanceBetweenPointsNew($latitude1, $longitude1, $latitude2, $longitude2)
+    {
+        // Validasi jika input kosong
+        if (empty($latitude1) || empty($longitude1) || empty($latitude2) || empty($longitude2)) {
+            return 999999; // Return jarak sangat jauh agar akses ditolak
+        }
+
+        $theta = $longitude1 - $longitude2;
+        $miles = (sin(deg2rad($latitude1)) * sin(deg2rad($latitude2))) + (cos(deg2rad($latitude1)) * cos(deg2rad($latitude2)) * cos(deg2rad($theta)));
+        $miles = acos($miles);
+        $miles = rad2deg($miles);
+        $miles = $miles * 60 * 1.1515;
+        
+        $kilometers = $miles * 1.609344;
+        $meters = $kilometers * 1000;
+        
+        return $meters;
     }
 }

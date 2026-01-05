@@ -1,147 +1,201 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Surat Balasan Magang</title>
+    <title>Surat Jawaban Permohonan PKL</title>
     <style>
-        body { font-family: 'Times New Roman', Times, serif; font-size: 12pt; line-height: 1.5; }
-        .kop-table { width: 100%; border-bottom: 3px double #000; margin-bottom: 20px; }
-        .kop-table td { border: none; padding: 5px; }
-        .logo-bps { width: 90px; }
-        .kop-text { text-align: left; }
-        .kop-title { font-size: 16px; font-weight: bold; text-transform: uppercase; }
-        .kop-sub { font-size: 14px; font-weight: bold; text-transform: uppercase; }
-        .kop-address { font-size: 10px; font-style: italic; }
+        body { font-family: 'Times New Roman', Times, serif; font-size: 11pt; line-height: 1.3; color: #000; margin: 0; padding: 0; }
+        .header-table { width: 100%; margin-bottom: 15px; padding-bottom: 5px; }
         
-        table.content-table { width: 100%; margin-top: 10px; border-collapse: collapse; }
-        table.content-table td { vertical-align: top; padding: 2px; }
+        .meta-table { width: 100%; margin-bottom: 20px; }
+        .meta-table td { vertical-align: top; }
+
+        .content-body { padding: 0 5px; text-align: justify; }
         
-        /* Update CSS TTD Box agar posisi tanggal pas */
-        .ttd-box { float: right; width: 300px; margin-top: 40px; text-align: left; }
+        .student-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        .student-table th, .student-table td { border: 1px solid #000; padding: 5px; text-align: center; font-size: 10pt; }
+        .student-table th { background-color: #f2f2f2; font-weight: bold; text-transform: uppercase; }
         
-        /* Footer BSrE */
-        .bsre-footer {
-            clear: both;
-            margin-top: 50px;
-            font-size: 10pt;
-            color: #555;
-            border-top: 1px solid #ccc;
-            padding-top: 10px;
-            text-align: center;
-            font-style: italic;
-            position: fixed; 
-            bottom: 0;
-            left: 0; 
-            right: 0;
+        .rules-list {
+			margin-left: 20px; 
+			margin-top: 10px;
+			padding-left: 20px; 
+		}
+        .rules-list li { margin-bottom: 5px; }
+
+        .footer-sign-wrap { 
+            width: 100%; 
+            margin-top: 20px; 
+            position: relative;
+        }
+
+        .tembusan-left { 
+            float: left; 
+            width: 55%; 
+            font-size: 9pt; 
+            margin-top: 60px;
+        }
+
+        .tembusan-left ol { 
+            margin-left: -20px; 
+            margin-top: 0; 
+        }
+
+        .ttd-right { 
+            float: right; 
+            width: 250px; 
+            text-align: left; 
+            font-size: 11pt; 
+        }
+
+        footer {
+            position: fixed; bottom: -30px; left: 0; right: 0; height: 100px;
+            font-family: Arial, sans-serif; font-size: 7pt; padding-top: 5px;
         }
     </style>
 </head>
 <body>
-    <table class="kop-table">
+    <?php
+        $logo_path = FCPATH . 'assets/img/logo.png';
+        $logo_data = (file_exists($logo_path)) ? 'data:image/png;base64,' . base64_encode(file_get_contents($logo_path)) : '';
+        
+        $iso_path = FCPATH . 'assets/img/logoiso_02.png';
+        $iso_data = (file_exists($iso_path)) ? 'data:image/png;base64,' . base64_encode(file_get_contents($iso_path)) : '';
+    ?>
+
+    <table class="header-table">
         <tr>
-            <td width="100" align="center">
-                <?php
-                // Convert gambar ke base64 agar tampil di PDF
-                $path = FCPATH . 'assets/img/logo.png';
-                $type = pathinfo($path, PATHINFO_EXTENSION);
-                $data = file_get_contents($path);
-                $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-                ?>
-                <img src="<?= $base64 ?>" class="logo-bps">
+            <td width="300">
+                <?php if($logo_data): ?>
+                    <img src="<?= $logo_data ?>" width="220">
+                <?php endif; ?>
             </td>
-            <td class="kop-text">
-                <span class="kop-title">KRAKATAU INFORMATION TECHNOLOGY</span><br>
-                <span class="kop-address">
-                    Jl. Syeh Nawawi Al Bantani, Kawasan Pusat Pemerintahan Provinsi Banten (KP3B), Kav. H1-2 Serang Banten.<br>
-                    Telp: (0254) 267027. Email: email@krakatau-it.co.id, Website: https://www.krakatau-it.co.id
-                </span>
-            </td>
+            <td></td>
         </tr>
     </table>
 
-    <table class="content-table" style="margin-bottom: 20px;">
-        <tr>
-            <td width="80">Nomor</td>
-            <td width="10">:</td>
-            <td>B-<?= rand(1000,9999) ?>/36000/HM.340/<?= date('Y') ?></td>
-        </tr>
-        <tr>
-            <td>Sifat</td>
-            <td>:</td>
-            <td>Biasa</td>
-        </tr>
-        <tr>
-            <td>Lampiran</td>
-            <td>:</td>
-            <td>-</td>
-        </tr>
-        <tr>
-            <td>Hal</td>
-            <td>:</td>
-            <td><?= ($pendaftar->status == 'diterima') ? 'Penerimaan KKP Mahasiswa' : 'Informasi Hasil Seleksi Magang' ?></td>
-        </tr>
-    </table>
+    <div class="content-body">
+        <table class="meta-table">
+            <tr>
+                <td width="50">No.</td>
+                <td width="10">:</td>
+                <td width="250"><?= rand(100,999) ?>/DIV.HC&SM/KIT/<?= date('m') ?>/<?= date('Y') ?></td>
+                <td align="right">Cilegon, <?= date('d F Y') ?></td>
+            </tr>
+            <tr>
+                <td>Hal</td>
+                <td>:</td>
+                <td><b>Surat Jawaban Permohonan Kerja Praktek</b></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Lamp</td>
+                <td>:</td>
+                <td><?= ($pendaftar->status == 'diterima') ? '1 Lembar' : '-' ?></td>
+                <td></td>
+            </tr>
+        </table>
 
-    <p>
-        Yth. Dekan/Ketua/Kepala Sekolah <?= $pendaftar->institusi ?><br>
-        di<br>
-        Tempat
-    </p>
-
-    <p style="text-align: justify;">
-        Menindaklanjuti surat Nomor: <?= $pendaftar->no_surat ?> tanggal <?= date('d F Y', strtotime($pendaftar->tgl_surat)) ?>
-        tentang Permohonan Izin KKP (Kuliah Kerja Praktik) mahasiswa sebagai berikut :
-    </p>
-
-    <table class="content-table" style="margin-left: 20px; width: 90%;">
-        <tr>
-            <td width="150">Nama</td>
-            <td width="10">:</td>
-            <td><b><?= $pendaftar->nama ?></b></td>
-        </tr>
-        <tr>
-            <td>NIM / NIS</td>
-            <td>:</td>
-            <td><?= $pendaftar->nim_nis ?></td>
-        </tr>
-        <tr>
-            <td>Jurusan / Prodi</td>
-            <td>:</td>
-            <td><?= $pendaftar->jurusan ?></td>
-        </tr>
-        <tr>
-            <td>Fakultas</td>
-            <td>:</td>
-            <td><?= $pendaftar->fakultas ?></td>
-        </tr>
-    </table>
-
-    <?php if($pendaftar->status == 'diterima'): ?>
-        <p style="text-align: justify;">
-            Bersama ini disampaikan pada prinsipnya kami <b>tidak berkeberatan dan menerima</b>
-            mahasiswa tersebut untuk melaksanakan Kuliah Kerja Praktik di Krakatau Information Technology (KIT) mulai tanggal <?= date('d F Y', strtotime($pendaftar->tgl_mulai)) ?> s.d <?= date('d F Y', strtotime($pendaftar->tgl_selesai)) ?>.
+        <p>
+            Yth. Dekan/Kepala/Pimpinan<br>
+            <b><?= $pendaftar->institusi ?></b><br>
+            di<br>
+            Tempat
         </p>
-    <?php else: ?>
-        <p style="text-align: justify;">
-            Bersama ini disampaikan bahwa berdasarkan hasil seleksi berkas dan ketersediaan kuota, dengan berat hati kami menginformasikan bahwa mahasiswa tersebut 
-            <b>belum dapat diterima</b> untuk melaksanakan Kuliah Kerja Praktik di Krakatau Information Technology (KIT) untuk periode yang diajukan.
+
+        <p>Dengan hormat,</p>
+
+        <p>
+            Menanggapi Surat dari <?= $pendaftar->institusi ?> No. <?= $pendaftar->no_surat ?> Tanggal <?= date('d F Y', strtotime($pendaftar->tgl_surat)) ?>, perihal Permohonan PKL atas nama sebagai berikut:
         </p>
-    <?php endif; ?>
 
-    <p>
-        Demikian disampaikan, atas perhatian dan kerjasamanya diucapkan terimakasih.
-    </p>
+        <table class="student-table">
+            <thead>
+                <tr>
+                    <th width="30">No.</th>
+                    <th>Nama Siswa/i</th>
+                    <th>NIM/NIS</th>
+                    <th>Prodi/Jurusan</th>
+                    <th>Lokasi Penempatan</th>
+                    <th>Periode</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1.</td>
+                    <td align="left"><b><?= strtoupper($pendaftar->nama) ?></b></td>
+                    <td><?= $pendaftar->nim_nis ?></td>
+                    <td><?= $pendaftar->jurusan ?></td>
+                    <td><?= ($pendaftar->status == 'diterima') ? $nama_lokasi : '-' ?></td>
+                    <td><?= date('d/m/y', strtotime($pendaftar->tgl_mulai)) ?> s.d <?= date('d/m/y', strtotime($pendaftar->tgl_selesai)) ?></td>
+                </tr>
+            </tbody>
+        </table>
 
-    <div class="ttd-box">
-        Cilegon, <?= date('d F Y') ?>
-        <br>
-        Plt. Kepala Jabatan KIT,
-        <br><br><br><br><br>
-        <b>Nama Pejabat KIT</b>
+        <?php if($pendaftar->status == 'diterima'): ?>
+            <p>Maka dengan ini kami <b>menyetujui</b> Permohonan PKL tersebut di PT Krakatau Information Technology.</p>
+            
+            <p><b>Hal yang harus diperhatikan dalam pelaksanaan adalah sebagai berikut:</b></p>
+            <ol class="rules-list">
+                <li>Melaksanakan Program PKL dengan tertib dan mematuhi aturan yang berlaku di Perusahaan.</li>
+                <li>Melaksanakan Program PKL di tempat yang sudah ditentukan (Divisi: <b><?= $nama_divisi ?></b>).</li>
+                <li>Menyerahkan Pas Photo 4x6: 1 Lembar (Tulis Nama & NIM) dikirimkan melalui email Human Capital.</li>
+                <li>Membuat absen kehadiran melalui sistem dan laporan akhir praktek kerja lapangan.</li>
+                <li>Dilarang melakukan aktifitas tanpa petunjuk dari pembimbing lapangan.</li>
+                <li>Dilarang melakukan copy/backup dokumen perusahaan termasuk source code program tanpa izin.</li>
+            </ol>
+            <p>Demikian kami sampaikan atas perhatian dan kerjasamanya, kami ucapkan terimakasih.</p>
+        <?php else: ?>
+            <p>
+                Berdasarkan hasil seleksi berkas dan mempertimbangkan kapasitas kuota bimbingan pada divisi terkait, dengan berat hati kami menginformasikan bahwa permohonan tersebut <b>belum dapat kami penuhi</b> untuk periode yang diajukan.
+            </p>
+            <p>Demikian informasi ini kami sampaikan, atas perhatian dan kerjasamanya kami ucapkan terimakasih.</p>
+        <?php endif; ?>
+
+        <div class="footer-sign-wrap">
+            <div class="tembusan-left">
+                Tembusan:
+                <ol>
+                    <li>Manager <?= ($pendaftar->status == 'diterima') ? $nama_divisi : 'Terkait' ?> PT Krakatau IT</li>
+                    <li>Ybs</li>
+                    <li>Arsip</li>
+                </ol>
+            </div>
+
+            <div class="ttd-right">
+                <b>HUMAN CAPITAL & SM</b><br>
+                KRAKATAU TECHNOLOGY,
+                <br><br><br><br><br>
+                <b>ASEP KUNKUN K.</b><br>
+                Manager
+            </div>
+
+            <div style="clear: both;"></div>
+        </div>
     </div>
 
-    <div class="bsre-footer">
-        Dokumen ini telah ditanda tangani secara elektronik menggunakan sertifikat elektronik yang diterbitkan oleh Balai Besar Sertifikasi Elektronik (BSrE), Badan Siber dan Sandi Negara (BSSN).
-    </div>
-
+    <footer>
+        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+            <tr valign="top">
+                <td width="35%">
+					<b>PT Krakatau Information Technology</b><br>
+					Krakatau Steel Building 9<sup>th</sup> Floor,<br>
+					Jl. Jend. Gatot Subroto Kav, 54 Jakarta 12950<br><br>
+					<span style="color:#0000FF; font-weight:bold;">P</span> +62 21 - 5200732
+				</td>
+				<td width="35%" style="padding-left: 10px;">
+					<b>Cilegon Office</b><br>
+					Jl. Raya Anyer Km. 3 Cilegon 42441,<br>
+					Banten - Indonesia<br><br>
+					<span style="color:#0000FF; font-weight:bold;">P</span> +62 254 - 8317021<br><br>
+					<b>www.krakatau-it.co.id</b>
+				</td>
+				<td width="30%" align="right">
+					<?php if($iso_data): ?>
+						<img src="<?= $iso_data ?>" height="50">
+					<?php endif; ?>
+				</td>
+            </tr>
+        </table>
+    </footer>
 </body>
 </html>

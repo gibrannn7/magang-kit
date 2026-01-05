@@ -20,7 +20,6 @@
             box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
         }
 
-        /* Perbaikan CSS Captcha agar Full & Estetis */
         .captcha-container {
             width: 100%;
             min-height: 100px;
@@ -32,7 +31,7 @@
         .captcha-container img {
             width: 100%;
             height: 100%;
-            object-fit: contain; /* Menjaga teks tidak terpotong */
+            object-fit: contain; 
             display: block;
             border-radius: 0.5rem;
         }

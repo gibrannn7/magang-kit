@@ -5,7 +5,7 @@ class Wa_client {
 
     protected $ci;
     private $api_url = 'http://localhost:3000/send-message'; 
-    private $api_key = 'BPS_SECRET_KEY_123456'; 
+    private $api_key = 'KIT_SECRET_KEY_123456'; 
 
     public function __construct() {
         $this->ci =& get_instance();

@@ -19,15 +19,13 @@
     background-color: #1e3a8a !important;
     display: flex;
     align-items: center;
-    height: 60px; /* kunci tinggi biar normal */
+    height: 60px; 
   }
 
   .brand-text {
     font-size: 14px;
     white-space: normal;
     line-height: 1.2;
-
-    /* Batasi 2 baris saja */
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -85,7 +83,7 @@
 
       <nav class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
-          
+          <!-- ADMIN / HC -->
           <?php if($this->session->userdata('role') == 'admin'): ?>
 						<li class="nav-item">
 							<a href="<?= base_url('admin') ?>" class="nav-link <?= ($this->uri->segment(1)=='admin' && $this->uri->segment(2)=='')?'active':'' ?>">
@@ -99,6 +97,12 @@
                 <p>Monitoring Absensi</p>
               </a>
             </li>
+						<li class="nav-item">
+								<a href="<?= base_url('admin/laporan_global') ?>" class="nav-link <?= ($this->uri->segment(2)=='laporan_global')?'active':'' ?>">
+										<i class="nav-icon fas fa-chart-line"></i>
+										<p>Laporan Performa Divisi</p>
+								</a>
+						</li>
 						<li class="nav-item">
 							<a href="<?= base_url('admin/data_peserta') ?>" class="nav-link <?= ($this->uri->segment(2)=='data_peserta')?'active':'' ?>">
 								<i class="nav-icon fas fa-users"></i>
@@ -135,11 +139,24 @@
 						<li class="nav-item">
 								<a href="<?= base_url('admin/master_admin') ?>" class="nav-link">
 										<i class="nav-icon fas fa-user-shield"></i>
-										<p>Manajemen Admin</p>
+										<p>Manajemen Staff</p>
+								</a>
+						</li>
+						<li class="nav-item">
+								<a href="<?= base_url('admin/master_divisi') ?>" class="nav-link <?= ($this->uri->segment(2)=='master_divisi')?'active':'' ?>">
+										<i class="nav-icon fas fa-sitemap"></i>
+										<p>Data Divisi</p>
+								</a>
+						</li>
+						<li class="nav-item">
+								<a href="<?= base_url('admin/master_lokasi') ?>" class="nav-link <?= ($this->uri->segment(2)=='master_lokasi')?'active':'' ?>">
+										<i class="nav-icon fas fa-map-marked-alt"></i>
+										<p>Data Lokasi</p>
 								</a>
 						</li>
 				<?php endif; ?>
 
+				<!-- PESERTA -->
           <?php if($this->session->userdata('role') == 'peserta'): ?>
             <li class="nav-item">
               <a href="<?= base_url('peserta') ?>" class="nav-link <?= ($this->uri->segment(1)=='peserta' && $this->uri->segment(2)=='')?'active':'' ?>">
@@ -169,6 +186,29 @@
               </a>
             </li>
           <?php endif; ?>
+
+					<!-- MENTOR -->
+					<?php if($this->session->userdata('role') == 'mentor'): ?>
+						<li class="nav-item">
+								<a href="<?= base_url('mentor') ?>" class="nav-link <?= ($this->uri->segment(1)=='mentor' && $this->uri->segment(2)=='')?'active':'' ?>">
+										<i class="nav-icon fas fa-tachometer-alt"></i>
+										<p>Dashboard Mentor</p>
+								</a>
+						</li>
+						<li class="nav-item">
+								<a href="<?= base_url('mentor/monitoring_absensi') ?>" class="nav-link <?= ($this->uri->segment(2)=='monitoring_absensi')?'active':'' ?>">
+										<i class="nav-icon fas fa-user-check"></i>
+										<p>Monitoring Absensi</p>
+								</a>
+						</li>
+
+						<li class="nav-item">
+								<a href="<?= base_url('mentor/request_magang') ?>" class="nav-link <?= ($this->uri->segment(2)=='request_magang')?'active':'' ?>">
+										<i class="nav-icon fas fa-paper-plane"></i>
+										<p>Request Anak Magang</p>
+								</a>
+						</li>
+				<?php endif; ?>
 
         </ul>
       </nav>

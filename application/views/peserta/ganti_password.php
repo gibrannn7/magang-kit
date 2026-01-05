@@ -19,9 +19,7 @@
                             </div>
                         </div>
                     </div>
-
                     <hr>
-
                     <div class="form-group">
                         <label>Password Baru</label>
                         <div class="input-group mb-3">
@@ -33,7 +31,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="form-group">
                         <label>Konfirmasi Password Baru</label>
                         <div class="input-group mb-3">
@@ -46,7 +43,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="card-footer">
                     <button type="submit" class="btn btn-primary btn-block">
                         <i class="fas fa-save mr-1"></i> Simpan Password Baru

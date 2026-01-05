@@ -6,25 +6,23 @@ class Home extends CI_Controller {
 	public function __construct()
     {
         parent::__construct();
-        // Load model M_Home
-        $this->load->model('M_Home');
+        $this->load->model(['M_Home', 'M_Master']);
     }
 
     public function index()
-    {
-        $data['title'] = 'Beranda';
+	{
+		$data['title'] = 'Beranda';
 
-        // Refactor: Menggunakan Model
+		$data['divisi'] = $this->M_Master->get_all_divisi();
 		$data['kampus_list'] = $this->M_Home->get_all_institusi();
 		$data['fakultas_list'] = $this->M_Home->get_all_fakultas();
-        $data['jurusan_list'] = $this->M_Home->get_all_jurusan();
+		$data['jurusan_list'] = $this->M_Home->get_all_jurusan();
 
 		$this->load->view('home/index', $data);
-    }
+	}
 
 	public function submit()
 	{
-		// 1. Validasi Input Dasar (Tetap di Controller)
 		$this->form_validation->set_rules('nama', 'Nama Lengkap', 'required|trim|xss_clean');
 		$this->form_validation->set_rules('email', 'Email', 'required|trim|valid_email|is_unique[users.email]|is_unique[pendaftar.email]', [
 			'is_unique' => 'Email ini sudah terdaftar. Silakan gunakan email lain atau login.'
@@ -34,6 +32,8 @@ class Home extends CI_Controller {
 		$this->form_validation->set_rules('no_surat', 'Nomor Surat', 'required|trim');
 		$this->form_validation->set_rules('tgl_surat', 'Tanggal Surat', 'required');
 		$this->form_validation->set_rules('fakultas', 'Fakultas', 'required|trim');
+		$this->form_validation->set_rules('jurusan', 'Jurusan', 'required');
+		$this->form_validation->set_rules('divisi_id', 'Divisi', 'required');
 		$this->form_validation->set_rules('no_hp', 'Nomor WhatsApp', 'required|numeric|min_length[10]|max_length[15]');
 		$this->form_validation->set_rules('alamat', 'Alamat Domisili', 'required|trim');
 		$this->form_validation->set_rules('tgl_mulai', 'Tanggal Mulai', 'required');
@@ -45,14 +45,11 @@ class Home extends CI_Controller {
 			return;
 		}
 
-		// 2. Hitung Durasi (Tetap di Controller)
 		$d1 = new DateTime($this->input->post('tgl_mulai'));
 		$d2 = new DateTime($this->input->post('tgl_selesai'));
 		$interval = $d1->diff($d2);
 		$durasi_bulan = $interval->m + ($interval->y * 12) + ($interval->d > 15 ? 1 : 0); 
 		if($durasi_bulan < 1) $durasi_bulan = 1;
-
-		// 3. Konfigurasi Upload (Tetap di Controller)
 		$upload_cv = $this->_upload_file('file_cv', 'cv', 'pdf|doc|docx');
 		$upload_foto = $this->_upload_file('file_foto', 'foto', 'jpg|jpeg|png');
 		$upload_surat = $this->_upload_file('file_surat', 'surat', 'pdf|jpg|jpeg|png');
@@ -68,7 +65,6 @@ class Home extends CI_Controller {
 			return;
 		}
 
-		// 4. Persiapan Data untuk Model
 		$data_pendaftar = [
 			'nama' => $this->input->post('nama', TRUE),
 			'email' => $this->input->post('email', TRUE),
@@ -79,6 +75,7 @@ class Home extends CI_Controller {
 			'institusi' => $this->input->post('institusi', TRUE),
 			'fakultas' => $this->input->post('fakultas', TRUE),
 			'jurusan' => $this->input->post('jurusan', TRUE),
+			'divisi_id'       => $this->input->post('divisi_id', TRUE),
 			'no_hp' => $this->input->post('no_hp'),
 			'alamat' => $this->input->post('alamat', TRUE),
 			'jenis_magang' => $this->input->post('jenis_magang'),
@@ -106,7 +103,6 @@ class Home extends CI_Controller {
             ]
         ];
 
-        // 5. Eksekusi Simpan via Model (Refactor)
         $simpan = $this->M_Home->simpan_pendaftaran($data_pendaftar, $data_dokumen);
 
         if ($simpan === FALSE) {
@@ -127,7 +123,7 @@ class Home extends CI_Controller {
         $config['upload_path']   = './assets/uploads/' . $folder;
         $config['allowed_types'] = $types;
         $config['max_size']      = 5120; // 5MB
-        $config['encrypt_name']  = TRUE; // Security: Rename to Random UUID
+        $config['encrypt_name']  = TRUE;
 
         $this->load->library('upload', $config);
         $this->upload->initialize($config);

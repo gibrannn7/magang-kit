@@ -16,5 +16,7 @@ $config = [
     'charset'     => 'utf-8',
     'newline'     => "\r\n",
     'wordwrap'    => TRUE,
-    'crlf'        => "\r\n"
+    'crlf'        => "\r\n",
+	'from_email'  => 'EMAIL_USER',
+    'from_name'   => 'Krakatau Information Technology (KIT)'
 ];

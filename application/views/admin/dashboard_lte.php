@@ -70,7 +70,6 @@
     </div>
     <div class="card-body">
         <div class="tab-content">
-            
             <div class="tab-pane fade show active" id="tab-pending">
                 <table class="table table-bordered table-striped datatable-init">
                     <thead>
@@ -93,7 +92,7 @@
 									<i class="fas fa-eye"></i> Detail
 								</a>
 								<button type="button"
-										onclick="confirmAction('<?= base_url('admin/verifikasi/'.$p->id.'/diterima') ?>', 'terima')"
+										onclick="openModalTerima(<?= $p->id ?>, '<?= addslashes($p->nama) ?>', '<?= $p->divisi_id ?>')"
 										class="btn btn-xs btn-success"
 										title="Terima">
 									<i class="fas fa-check"></i> Terima
@@ -190,16 +189,16 @@
                                     </a>
                                     
                                     <?php if($p->user_id): ?>
-                                    <button 
-                                        type="button"
-                                        class="btn btn-xs btn-warning btn-reset-pass"
-                                        data-url="<?= base_url('admin/reset_password/'.$p->user_id) ?>"
-                                        data-nama="<?= $p->nama ?>"
-                                        title="Reset Password">
-                                        <i class="fas fa-key"></i> Reset
-                                    </button>
-                                    <?php endif; ?>
-                                    <?php endif; ?>
+										<button 
+											type="button"
+											class="btn btn-xs btn-warning btn-reset-pass"
+											data-url="<?= base_url('admin/reset_password/'.$p->user_id) ?>"
+											data-nama="<?= $p->nama ?>"
+											title="Reset Password">
+											<i class="fas fa-key"></i> Reset
+										</button>
+									<?php endif; ?>
+                            	<?php endif; ?>
                             </td>
                         </tr>
                         <?php endforeach; ?>
@@ -232,7 +231,6 @@ function confirmAction(url, action) {
         }
     });
 }
-// Logic Tamatkan Magang
 function confirmTamatkan(url) {
     Swal.fire({
         title: 'Tamatkan Magang?',
@@ -250,9 +248,7 @@ function confirmTamatkan(url) {
     });
 }
 
-// UPDATE: LOGIC RESET PASSWORD (Sama persis dengan data_peserta.php)
 document.addEventListener('click', function(e) {
-    // Menggunakan event delegation agar bekerja pada elemen dinamis/tab
     if (e.target.closest('.btn-reset-pass')) {
         const btn = e.target.closest('.btn-reset-pass');
         const url = btn.getAttribute('data-url');
@@ -274,4 +270,98 @@ document.addEventListener('click', function(e) {
         });
     }
 });
+</script>
+<div class="modal fade" id="modalTerima" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="fas fa-user-check"></i> Konfirmasi Penerimaan & Penempatan</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="formTerima" action="" method="post">
+                <input type="hidden" name="<?= $this->security->get_csrf_token_name(); ?>" value="<?= $this->security->get_csrf_hash(); ?>">
+                
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <small><i class="fas fa-info-circle"></i> Menyetujui <b id="nama_peserta_modal"></b>. Peserta akan mendapatkan akun login otomatis.</small>
+                    </div>
+                    
+                    <div class="callout callout-info bg-light border-left-info shadow-sm">
+                        <h6 class="font-weight-bold text-info"><i class="fas fa-users-cog mr-2"></i> Akumulasi Kebutuhan Divisi</h6>
+                        <table class="table table-sm table-striped mb-0 mt-2" style="font-size: 13px;">
+                            <thead>
+                                <tr class="text-muted">
+                                    <th>Divisi</th>
+                                    <th class="text-center">Kebutuhan</th>
+                                    <th class="text-center">Sisa Slot</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <?php if(empty($kebutuhan_divisi)): ?>
+                                <tr><td colspan="3" class="text-center text-muted">Belum ada data kebutuhan.</td></tr>
+                            <?php else: foreach($kebutuhan_divisi as $kb): ?>
+                                <tr>
+                                    <td><?= $kb->nama_divisi ?></td>
+                                    <td class="text-center"><?= $kb->total_terisi ?> / <?= $kb->total_diminta ?></td>
+                                    <td class="text-center">
+                                        <?php if($kb->sisa_kuota > 0): ?>
+                                            <span class="badge badge-danger"><?= $kb->sisa_kuota ?> Slot</span>
+                                        <?php else: ?>
+                                            <span class="badge badge-secondary">Full</span>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                    <hr>                   
+                    <div class="form-group">
+                        <label class="font-weight-bold">Divisi Penempatan Final</label>
+                        <select name="divisi_id_final" id="divisi_id_final" class="form-control" required>
+                            <option value="">-- Pilih Divisi --</option>
+                            <?php foreach($divisi as $dl): ?>
+                                <option value="<?= $dl->id ?>"><?= $dl->nama_divisi ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="font-weight-bold">Lokasi Absensi (Geofencing)</label>
+                        <select name="lokasi_id_final" class="form-control" required>
+                            <option value="">-- Pilih Titik Lokasi --</option>
+                            <?php foreach($lokasi as $ll): ?>
+                                <option value="<?= $ll->id ?>">
+                                    <?= $ll->nama_lokasi ?> (Radius: <?= $ll->radius_meter ?>m)
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <small class="text-muted text-danger">*Wajib agar peserta bisa absen.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-success shadow">Simpan & Terima Peserta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+/**
+ * Fungsi untuk membuka modal terima pendaftar
+ * @param id ID Pendaftar
+ * @param nama Nama Pendaftar
+ * @param divisiId Pilihan divisi saat daftar
+ */
+function openModalTerima(id, nama, divisiId) {
+    const url = "<?= base_url('admin/verifikasi/') ?>" + id + "/diterima";
+    $('#formTerima').attr('action', url);
+    $('#nama_peserta_modal').text(nama);
+    $('#divisi_id_final').val(divisiId);
+    $('#modalTerima').modal('show');
+}
 </script>

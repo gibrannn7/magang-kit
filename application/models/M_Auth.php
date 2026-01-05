@@ -8,8 +8,7 @@ class M_Auth extends CI_Model {
         return $this->db->get_where('users', ['email' => $email])->row();
     }
 
-    // FIX: Menambahkan fungsi yang menyebabkan error di Admin & Peserta
-    public function get_user_by_id($id)
+	public function get_user_by_id($id)
     {
         return $this->db->get_where('users', ['id' => $id])->row();
     }
@@ -20,7 +19,6 @@ class M_Auth extends CI_Model {
         return $this->db->update('users', $data);
     }
 
-    // FIX: Menambahkan fungsi untuk reset password via email
     public function update_user_by_email($email, $data)
     {
         $this->db->where('email', $email);

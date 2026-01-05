@@ -121,8 +121,13 @@ class M_Admin extends CI_Model {
     }
 
     public function get_admins() {
-        return $this->db->get_where('users', ['role' => 'admin'])->result();
-    }
+		return $this->db->select('users.*, master_divisi.nama_divisi')
+			->from('users')
+			->join('master_divisi', 'master_divisi.id = users.divisi_id', 'left')
+			->where_in('role', ['admin', 'mentor'])
+			->get()
+			->result();
+	}
 
     public function insert_admin($data) {
         return $this->db->insert('users', $data);

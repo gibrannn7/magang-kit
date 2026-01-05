@@ -107,14 +107,14 @@
     let csrfName = '<?= $this->security->get_csrf_token_name() ?>';
     let csrfHash = '<?= $this->security->get_csrf_hash() ?>';
 
-    // 1. Setup Webcam
+    // Setup Webcam
     Webcam.set({ width: 320, height: 240, image_format: 'jpeg', jpeg_quality: 90 });
     Webcam.attach('#my_camera');
 
     let userLat = null;
     let userLong = null;
 
-    // 2. Geolocation
+    // Geolocation
     if (navigator.geolocation) {
         const options = {
             enableHighAccuracy: true,
@@ -155,7 +155,6 @@
         });
     }
 
-    // --- FUNGSI KIRIM UMUM (Handling JSON & Error) ---
     async function sendData(url, formData) {
         // Append Token CSRF Terbaru
         formData.append(csrfName, csrfHash);
@@ -191,44 +190,43 @@
 
     // KIRIM ABSEN HADIR
     function kirimAbsen(tipe) {
-        const foto = document.getElementById('foto_data').value;
-        if(!foto) { Swal.fire('Foto Wajib', 'Ambil foto terlebih dahulu!', 'warning'); return; }
-        if(!userLat) { Swal.fire('Lokasi Error', 'Lokasi belum ditemukan!', 'warning'); return; }
+		const foto = document.getElementById('foto_data').value;
+		if(!foto) { Swal.fire('Foto Wajib', 'Ambil foto terlebih dahulu!', 'warning'); return; }
+		if(!userLat) { Swal.fire('Lokasi Error', 'Lokasi belum ditemukan!', 'warning'); return; }
 
-        Swal.fire({
-            title: 'Kirim Absensi?',
-            text: `Anda akan melakukan absen ${tipe}`,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Ya, Kirim!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+		Swal.fire({
+			title: 'Kirim Absensi?',
+			text: `Anda akan melakukan absen ${tipe}`,
+			icon: 'question',
+			showCancelButton: true,
+			confirmButtonText: 'Ya, Kirim!'
+		}).then((result) => {
+			if (result.isConfirmed) {
+				Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
 
-                const formData = new FormData();
-                formData.append('latitude', userLat);
-                formData.append('longitude', userLong);
-                formData.append('tipe', tipe);
-                formData.append('foto', foto);
-                formData.append('is_izin', 'false');
+				const formData = new FormData();
+				formData.append('lat', userLat);
+				formData.append('long', userLong);
+				formData.append('tipe', tipe);
+				formData.append('foto', foto);
+				formData.append('is_izin', 'false');
 
-                sendData('<?= base_url('peserta/submit_absen') ?>', formData)
-                .then(data => {
-                    Swal.close(); // Tutup loading
-                    if(data.status) {
-                        Swal.fire('Berhasil', data.message, 'success').then(() => window.location.href='<?= base_url('peserta') ?>');
-                    } else {
-                        Swal.fire('Gagal', data.message, 'error');
-                    }
-                })
-                .catch(err => {
-                    Swal.close();
-                    console.error(err);
-                    Swal.fire('System Error', err.message, 'error');
-                });
-            }
-        });
-    }
+				sendData('<?= base_url('peserta/submit_absen') ?>', formData)
+				.then(data => {
+					Swal.close();
+					if(data.status) {
+						Swal.fire('Berhasil', data.message, 'success').then(() => window.location.href='<?= base_url('peserta') ?>');
+					} else {
+						Swal.fire('Gagal', data.message, 'error');
+					}
+				})
+				.catch(err => {
+					Swal.close();
+					Swal.fire('System Error', err.message, 'error');
+				});
+			}
+		});
+	}
 
     // KIRIM IZIN
     function kirimIzin() {

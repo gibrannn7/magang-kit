@@ -14,17 +14,15 @@
             height: 100%;
         }
         
-        /* Gambar Background dijadikan layer paling bawah */
         .bg-template {
-            position: fixed; /* Atau absolute */
+            position: fixed; 
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1; /* PENTING: Agar ada di belakang teks */
+            z-index: -1; 
         }
 
-        /* Container Teks */
         .content-layer {
             position: absolute;
             top: 0;
@@ -32,15 +30,14 @@
             width: 100%;
             height: 100%;
             text-align: center;
-            z-index: 1; /* Di atas gambar */
+            z-index: 1;
         }
 
-        /* 1. NAMA PESERTA */
         .nama-peserta {
             position: absolute;
             width: 80%;
             left: 10%;
-            top: 42%; /* Geser nilai ini untuk naik/turun */
+            top: 42%; 
             
             font-weight: 900; 
             font-size: 46pt; 
@@ -49,27 +46,21 @@
             line-height: 1;
         }
 
-        /* 2. PERIODE & KALIMAT */
         .periode-text {
             position: absolute;
             width: 70%;
             left: 15%;
-            top: 58%; /* Geser nilai ini untuk naik/turun */
+            top: 58%; 
             
             font-size: 14pt;
             color: #000000;
             line-height: 1.5;
         }
 
-        /* 3. TANGGAL SERTIFIKAT */
         .tanggal-sertif {
             position: absolute;
             width: 100%;
-            
-            /* ATUR NAIK/TURUN DISINI */
-            /* Semakin BESAR %, semakin ke ATAS */
-            /* Semakin KECIL %, semakin ke BAWAH */
-            bottom: 27%;  /* Sebelumnya 22%, saya naikkan jadi 25% */
+            bottom: 27%;  
             
             font-size: 12pt;
             font-weight: bold;
@@ -77,13 +68,9 @@
             text-align: center; 
         }
         
-        /* ATUR KIRI/KANAN DISINI */
         .geser-kanan {
             display: inline-block;
-            
-            /* Semakin BESAR px, semakin ke KANAN */
-            /* Semakin KECIL px, semakin ke KIRI */
-            margin-left: -10px; /* Sebelumnya 250px, saya kurangi biar geser kiri */
+            margin-left: -10px;
         }
     </style>
 </head>

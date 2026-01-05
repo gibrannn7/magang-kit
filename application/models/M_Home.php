@@ -37,18 +37,18 @@ class M_Home extends CI_Model {
     {
         $this->db->trans_start();
 
-        // 1. Insert ke tabel pendaftar
+        // Insert ke tabel pendaftar
         $this->db->insert('pendaftar', $data_pendaftar);
         $pendaftar_id = $this->db->insert_id();
 
-        // 2. Siapkan data dokumen dengan pendaftar_id yang baru saja di-insert
+        // Siapkan data dokumen dengan pendaftar_id yang baru saja di-insert
         $final_dokumen = [];
         foreach ($data_dokumen as $dok) {
             $dok['pendaftar_id'] = $pendaftar_id;
             $final_dokumen[] = $dok;
         }
 
-        // 3. Insert Batch ke tabel dokumen
+        // Insert Batch ke tabel dokumen
         $this->db->insert_batch('dokumen', $final_dokumen);
 
         $this->db->trans_complete();

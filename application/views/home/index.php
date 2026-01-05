@@ -113,6 +113,34 @@
 		.nav-link:hover::after {
 			width: 100%;
 		}
+
+		html, body {
+			max-width: 100%;
+			overflow-x: hidden;
+			position: relative;
+		}
+
+		section, footer {
+			overflow-x: hidden;
+		}
+
+		@media (max-width: 640px) {
+			.hero-content h1 {
+				font-size: 2.25rem;
+				line-height: 1.2;
+			}
+		}
+
+		nav, .nav-link, #nav-logo-text, #btn-login {
+			transition: all 0.3s ease-in-out;
+		}
+
+		.nav-text-dark {
+			color: #003366 !important;
+		}
+		.nav-text-dark:hover {
+			color: #0099CC !important;
+		}
     </style>
 </head>
 <body class="bg-gray-50 flex flex-col min-h-screen">
@@ -127,10 +155,10 @@
 				</div>
 
 				<div class="hidden md:flex space-x-8 items-center">
-					<a href="#home" class="nav-link text-gray-200 hover:text-white font-medium transition-all duration-300">Beranda</a>
-					<a href="#about" class="nav-link text-gray-200 hover:text-white font-medium transition-all duration-300">Tentang</a>
-					<a href="#daftar" class="nav-link text-gray-200 hover:text-white font-medium transition-all duration-300">Pendaftaran</a>
-					<a href="<?= base_url('auth/login') ?>" class="bg-white text-kit-dark px-6 py-2 rounded-full font-bold hover:bg-kit-accent hover:text-white transition shadow-lg transform hover:-translate-y-0.5">Login</a>
+					<a href="#home" class="nav-link nav-item text-gray-200 hover:text-white font-medium">Beranda</a>
+					<a href="#about" class="nav-link nav-item text-gray-200 hover:text-white font-medium">Tentang</a>
+					<a href="#daftar" class="nav-link nav-item text-gray-200 hover:text-white font-medium">Pendaftaran</a>
+					<a href="<?= base_url('auth/login') ?>" id="btn-login" class="bg-white text-kit-dark px-6 py-2 rounded-full font-bold shadow-lg">Login</a>
 				</div>
 
 				<div class="md:hidden flex items-center">
@@ -305,102 +333,123 @@
                     </div>
 
                     <div id="form-step-2" class="space-y-8 hidden">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            
-                            <div class="md:col-span-2">
-                                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
-                                    <div class="flex">
-                                        <div class="ml-3">
-                                            <p class="text-sm text-yellow-700">
-                                                Masukan Nomor Surat Permohonan sesuai surat resmi dari Kampus/Sekolah. <br>
-                                                Contoh: <b>202/FILKOM/I.I/XI/2025</b>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+							
+							<div class="md:col-span-2">
+								<div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+									<div class="flex">
+										<div class="ml-3">
+											<p class="text-sm text-yellow-700">
+												Masukan Nomor Surat Permohonan sesuai surat resmi dari Kampus/Sekolah. <br>
+											</p>
+										</div>
+									</div>
+								</div>
+							</div>
 
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Nomor Surat Permohonan</label>
-                                <input type="text" name="no_surat" required class="w-full rounded-xl border-gray-300 px-5 py-3 border bg-gray-50 focus:bg-white transition" placeholder="Nomor Surat Kampus/Sekolah">
-                            </div>
+							<div>
+								<label class="block text-sm font-semibold text-gray-700 mb-2">Nomor Surat Permohonan</label>
+								<input type="text" name="no_surat" required class="w-full rounded-xl border-gray-300 px-5 py-3 border bg-gray-50 focus:bg-white transition" placeholder="Nomor Surat Kampus/Sekolah">
+							</div>
 
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Tanggal Surat Dibuat</label>
-                                <input type="date" name="tgl_surat" required class="w-full rounded-xl border-gray-300 px-5 py-3 border bg-gray-50 focus:bg-white transition">
-                            </div>
+							<div>
+								<label class="block text-sm font-semibold text-gray-700 mb-2">Tanggal Surat Dibuat</label>
+								<input type="date" name="tgl_surat" required class="w-full rounded-xl border-gray-300 px-5 py-3 border bg-gray-50 focus:bg-white transition">
+							</div>
 
-                            <div class="md:col-span-2 border-t pt-4"></div>
+							<div class="md:col-span-2 border-t pt-4"></div>
 
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Instansi / Universitas / Sekolah</label>
-                                <input list="list-kampus" name="institusi" required class="w-full rounded-xl border-gray-300 px-5 py-3 border bg-gray-50 focus:bg-white transition" placeholder="Ketik nama kampus/sekolah...">
-                                <datalist id="list-kampus">
-                                    <?php foreach($kampus_list as $k): ?>
-                                        <option value="<?= $k->nama_institusi ?>">
-                                    <?php endforeach; ?>
-                                </datalist>
-                            </div>
+							<div>
+								<label class="block text-sm font-semibold text-gray-700 mb-2">Instansi / Universitas / Sekolah</label>
+								<input list="list-kampus" name="institusi" required class="w-full rounded-xl border-gray-300 px-5 py-3 border bg-gray-50 focus:bg-white transition" placeholder="Ketik nama kampus/sekolah...">
+								<datalist id="list-kampus">
+									<?php foreach($kampus_list as $k): ?>
+										<option value="<?= $k->nama_institusi ?>">
+									<?php endforeach; ?>
+								</datalist>
+							</div>
 
-                            <div id="container-fakultas">
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Fakultas</label>
-                                <input list="list-fakultas" name="fakultas" id="input-fakultas" class="w-full rounded-xl border-gray-300 px-5 py-3 border bg-gray-50 focus:bg-white transition" placeholder="Pilih atau ketik fakultas...">
-                                
-                                <datalist id="list-fakultas">
-                                    <?php foreach($fakultas_list as $f): ?>
-                                        <option value="<?= $f->nama_fakultas ?>">
-                                    <?php endforeach; ?>
-                                </datalist>
-                                <small class="text-gray-500 text-xs mt-1">*Ketik manual jika tidak ada di list</small>
-                            </div>
+							<div id="container-fakultas">
+								<label class="block text-sm font-semibold text-gray-700 mb-2">Fakultas</label>
+								<input list="list-fakultas" name="fakultas" id="input-fakultas" class="w-full rounded-xl border-gray-300 px-5 py-3 border bg-gray-50 focus:bg-white transition" placeholder="Pilih atau ketik fakultas...">
+								
+								<datalist id="list-fakultas">
+									<?php foreach($fakultas_list as $f): ?>
+										<option value="<?= $f->nama_fakultas ?>">
+									<?php endforeach; ?>
+								</datalist>
+								<small class="text-gray-500 text-xs mt-1">*Ketik manual jika tidak ada di list</small>
+							</div>
 
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Jurusan / Program Studi</label>
-                                <input list="list-jurusan" name="jurusan" required class="w-full rounded-xl border-gray-300 px-5 py-3 border bg-gray-50 focus:bg-white transition" placeholder="Cari jurusan...">
-                                <datalist id="list-jurusan">
-                                    <?php foreach($jurusan_list as $j): ?>
-                                        <option value="<?= $j->nama_jurusan ?>">
-                                    <?php endforeach; ?>
-                                </datalist>
-                            </div>
+							<div>
+								<label class="block text-sm font-semibold text-gray-700 mb-2">Jurusan / Program Studi</label>
+								<input list="list-jurusan" name="jurusan" required class="w-full rounded-xl border-gray-300 px-5 py-3 border bg-gray-50 focus:bg-white transition" placeholder="Cari jurusan...">
+								<datalist id="list-jurusan">
+									<?php foreach($jurusan_list as $j): ?>
+										<option value="<?= $j->nama_jurusan ?>">
+									<?php endforeach; ?>
+								</datalist>
+							</div>
+							<div>
+								<label class="block text-sm font-semibold text-gray-700 mb-2">
+									Divisi yang Diminati <span class="text-red-500">*</span>
+								</label>
+								<select name="divisi_id" required
+									class="w-full rounded-xl border-gray-300 px-5 py-3 border bg-gray-50 focus:bg-white transition">
+									<option value="">-- Pilih Divisi --</option>
+									<?php if(!empty($divisi)): ?>
+										<?php foreach($divisi as $d): ?>
+											<option value="<?= $d->id ?>"><?= $d->nama_divisi ?></option>
+										<?php endforeach; ?>
+									<?php endif; ?>
+								</select>
+								<small class="text-gray-500 text-xs mt-1 block">
+									Pilih divisi yang sesuai dengan jurusan atau minat Anda.
+								</small>
+							</div>
+							<div>
+								<label class="block text-sm font-semibold text-gray-700 mb-2">Rencana Tanggal Mulai</label>
+								<input type="date" name="tgl_mulai" required class="w-full rounded-xl border-gray-300 px-5 py-3 border bg-gray-50 focus:bg-white focus:border-kit-light focus:ring-kit-light transition">
+							</div>
 
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Rencana Tanggal Mulai</label>
-                                <input type="date" name="tgl_mulai" required class="w-full rounded-xl border-gray-300 px-5 py-3 border bg-gray-50 focus:bg-white focus:border-kit-light focus:ring-kit-light transition">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Rencana Tanggal Selesai</label>
-                                <input type="date" name="tgl_selesai" required class="w-full rounded-xl border-gray-300 px-5 py-3 border bg-gray-50 focus:bg-white focus:border-kit-light focus:ring-kit-light transition">
-                            </div>
+							<div>
+								<label class="block text-sm font-semibold text-gray-700 mb-2">Rencana Tanggal Selesai</label>
+								<input type="date" name="tgl_selesai" required class="w-full rounded-xl border-gray-300 px-5 py-3 border bg-gray-50 focus:bg-white focus:border-kit-light focus:ring-kit-light transition">
+							</div>
 
-                            <div class="md:col-span-2">
-                                <label class="block text-sm font-semibold text-gray-700 mb-3">Jenis Permohonan Magang</label>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <label class="flex items-center p-4 border-2 rounded-xl cursor-pointer hover:bg-kit-soft hover:border-kit-light transition group">
-                                        <input type="radio" name="jenis_magang" value="wajib" checked class="w-5 h-5 text-kit-light focus:ring-kit-light border-gray-300">
-                                        <div class="ml-3">
-                                            <span class="block font-bold text-gray-800 group-hover:text-kit-dark">Magang Wajib / KKP</span>
-                                            <span class="block text-xs text-gray-500">Program wajib dari kampus/sekolah</span>
-                                        </div>
-                                    </label>
-                                    <label class="flex items-center p-4 border-2 rounded-xl cursor-pointer hover:bg-kit-soft hover:border-kit-light transition group">
-                                        <input type="radio" name="jenis_magang" value="mandiri" class="w-5 h-5 text-kit-light focus:ring-kit-light border-gray-300">
-                                        <div class="ml-3">
-                                            <span class="block font-bold text-gray-800 group-hover:text-kit-dark">Magang Mandiri</span>
-                                            <span class="block text-xs text-gray-500">Inisiatif pengembangan diri sendiri</span>
-                                        </div>
-                                    </label>
-                                </div>
-                            </div>
+							<div class="md:col-span-2">
+								<label class="block text-sm font-semibold text-gray-700 mb-3">Jenis Permohonan Magang</label>
+								<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+									<label class="flex items-center p-4 border-2 rounded-xl cursor-pointer hover:bg-kit-soft hover:border-kit-light transition group">
+										<input type="radio" name="jenis_magang" value="wajib" checked class="w-5 h-5 text-kit-light focus:ring-kit-light border-gray-300">
+										<div class="ml-3">
+											<span class="block font-bold text-gray-800 group-hover:text-kit-dark">Magang Wajib / KKP</span>
+											<span class="block text-xs text-gray-500">Program wajib dari kampus/sekolah</span>
+										</div>
+									</label>
+									<label class="flex items-center p-4 border-2 rounded-xl cursor-pointer hover:bg-kit-soft hover:border-kit-light transition group">
+										<input type="radio" name="jenis_magang" value="mandiri" class="w-5 h-5 text-kit-light focus:ring-kit-light border-gray-300">
+										<div class="ml-3">
+											<span class="block font-bold text-gray-800 group-hover:text-kit-dark">Magang Mandiri</span>
+											<span class="block text-xs text-gray-500">Inisiatif pengembangan diri sendiri</span>
+										</div>
+									</label>
+								</div>
+							</div>
 
-                        </div>
-                        <div class="flex justify-between pt-4">
-                            <button type="button" onclick="nextStep(1)" class="text-gray-500 font-semibold hover:text-kit-dark px-6 py-3 transition">Kembali</button>
-                            <button type="button" id="btn-next-2" onclick="nextStep(3)" disabled class="bg-gray-400 text-white px-8 py-3 rounded-xl font-bold transition shadow-lg flex items-center cursor-not-allowed">
-                                Selanjutnya <i class="fas fa-arrow-right ml-2"></i>
-                            </button>
-                        </div>
-                    </div>
+						</div>
+
+						<div class="flex justify-between pt-4">
+							<button type="button" onclick="nextStep(1)" class="text-gray-500 font-semibold hover:text-kit-dark px-6 py-3 transition">
+								Kembali
+							</button>
+							<button type="button" id="btn-next-2" onclick="nextStep(3)" disabled
+								class="bg-gray-400 text-white px-8 py-3 rounded-xl font-bold transition shadow-lg flex items-center cursor-not-allowed">
+								Selanjutnya <i class="fas fa-arrow-right ml-2"></i>
+							</button>
+						</div>
+					</div>
+
                     <div id="form-step-3" class="space-y-8 hidden">
                         <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 mb-6 flex items-start">
                             <i class="fas fa-info-circle text-blue-600 mt-1 mr-3 text-lg"></i>
@@ -593,11 +642,9 @@
         const icon = document.getElementById('menu-icon');
         const navLinks = document.querySelectorAll('.mobile-nav-link, .nav-link');
 
-        // Toggle Mobile Menu
         btn.addEventListener('click', () => {
             menu.classList.toggle('hidden');
             
-            // Ubah icon hamburger ke X saat terbuka
             if (menu.classList.contains('hidden')) {
                 icon.classList.replace('fa-times', 'fa-bars');
             } else {
@@ -605,10 +652,8 @@
             }
         });
 
-        // Close menu when clicking a link (mobile)
         navLinks.forEach(link => {
             link.addEventListener('click', (e) => {
-                // Pastikan target adalah anchor internal
                 const targetId = link.getAttribute('href');
                 if (targetId.startsWith('#')) {
                     menu.classList.add('hidden');
@@ -617,18 +662,31 @@
             });
         });
 
-        // Sticky Navbar Effect on Scroll
         window.addEventListener('scroll', function() {
-            const nav = document.querySelector('nav');
-            if (window.scrollY > 50) {
-                nav.classList.add('bg-kit-dark/90', 'backdrop-blur-lg', 'shadow-xl');
-                nav.classList.remove('absolute');
-                nav.classList.add('fixed');
-            } else {
-                nav.classList.remove('bg-kit-dark/90', 'backdrop-blur-lg', 'shadow-xl', 'fixed');
-                nav.classList.add('absolute');
-            }
-        });
+			const nav = document.querySelector('nav');
+			const navItems = document.querySelectorAll('.nav-item');
+			const btnLogin = document.getElementById('btn-login');
+			const mobileMenuBtn = document.getElementById('mobile-menu-button');
+
+			if (window.scrollY > 50) {
+				nav.classList.add('bg-white/90', 'backdrop-blur-lg', 'shadow-xl', 'fixed');
+				nav.classList.remove('absolute', 'bg-kit-dark/20', 'border-white/10');
+				navItems.forEach(item => item.classList.add('nav-text-dark'));
+				btnLogin.classList.add('bg-kit-dark', 'text-white');
+				btnLogin.classList.remove('bg-white', 'text-kit-dark');
+				mobileMenuBtn.classList.add('text-kit-dark');
+				mobileMenuBtn.classList.remove('text-white');
+				
+			} else {
+				nav.classList.remove('bg-white/90', 'backdrop-blur-lg', 'shadow-xl', 'fixed');
+				nav.classList.add('absolute', 'bg-kit-dark/20', 'border-white/10');
+				navItems.forEach(item => item.classList.remove('nav-text-dark'));
+				btnLogin.classList.remove('bg-kit-dark', 'text-white');
+				btnLogin.classList.add('bg-white', 'text-kit-dark');
+				mobileMenuBtn.classList.remove('text-kit-dark');
+				mobileMenuBtn.classList.add('text-white');
+			}
+		});
     });
 </script>
     
@@ -747,7 +805,7 @@
             jenisPesertaSelect.addEventListener('change', toggleFakultas);
         }
 
-        // 1. UPDATE FILE NAME LABEL (Agar tidak terlihat kosong)
+        // UPDATE FILE NAME LABEL (Agar tidak terlihat kosong)
         function updateFileLabel(input, labelId, iconId, containerId) {
             const label = document.getElementById(labelId);
             const icon = document.getElementById(iconId);
@@ -781,7 +839,7 @@
         }
 
         function validateAndSubmit() {
-            // Cek apakah data kosong (Validasi sederhana)
+            // Cek apakah data kosong
             const nama = document.querySelector('input[name="nama"]').value;
             const hp = document.querySelector('input[name="no_hp"]').value;
             const cv = document.getElementById('file_cv').files.length;
@@ -908,7 +966,7 @@
         // Fungsi untuk cek kelengkapan Step 1
         function validateStep1() {
             const step1Inputs = [
-                'nama', 'email', 'no_hp', 'nim_nis', 'alamat'
+                'nama', 'email', 'no_hp', 'jenis_peserta','nim_nis', 'alamat'
             ];
             let isValid = true;
             
@@ -932,7 +990,7 @@
         // Fungsi untuk cek kelengkapan Step 2
         function validateStep2() {
             const step2Inputs = [
-                'no_surat', 'tgl_surat', 'institusi', 'jurusan', 'tgl_mulai', 'tgl_selesai'
+                'no_surat', 'tgl_surat', 'institusi', 'jurusan', 'divisi_id','tgl_mulai', 'tgl_selesai'
             ];
             let isValid = true;
             
